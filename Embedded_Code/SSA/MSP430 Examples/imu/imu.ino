@@ -1,12 +1,13 @@
 /*
    Written and maintained by: 
    Andrew Kettle
-   November 14th, 2019
+   June 24th, 2020
 */
 
 //headers:
 
 #include "Wire.h"
+#include "Energia.h"
 
 //Functions:
 void I2C_init();
@@ -15,6 +16,10 @@ int16_t convert_16bit(int8_t high, int8_t low);
 float accel_conversion(int16_t rawaccel);
 float gyro_conversion(int16_t rawgyro);
 void printData(float accelx, float accely, float accelz, float gyrox, float gyroy, float gryoz);
+
+/* variable declerations (globals)*/
+int count = 0;
+float overall_accelx, overall_accely, overall_accelz, overall_gyrox, overall_gyroy, overall_gyroz;
 
 //pin declerations
 int sda = P2_2; //I2C pins
@@ -31,6 +36,8 @@ int scl = P2_1;
 #define mag_pwr 0x16 //the register that powers the mangetometer
 #define strtw 0xD6 //send before write?
 #define strtr 0xD5
+#define fifo_ctrl 0x2E
+#define fifo_src 0x2F
 
 #define gyroX0 0x18 //accel output registerss
 #define gyroX1 0x19
@@ -63,19 +70,22 @@ void I2C_init()
 { 
   pinMode(scl, INPUT_PULLUP);
   pinMode(sda, INPUT_PULLUP);
+  overall_accelx = overall_accely = overall_accelz = overall_gyrox = overall_gyroy = overall_gyroz = 0.0;
   Wire.begin(); //initialize i2c transmission
   Wire.beginTransmission(lsm9ds1_ag);
   //init power modes
   Wire.write(gyro_control1); //Control register for gyro
   Wire.write(193); //Powers and set to 952 HZ, stock settings elsewhere, trial and error with filtering currently
   Wire.write(accel_control4);
-  Wire.write(56); //Makes sure accel output is turned on
-  Wire.write(accel_control5);
-  Wire.write(56); 
+  Wire.write(56); //Makes sure gyro output is turned on
+  Wire.write(accel_control5); //was 56
+  Wire.write(56); //Makes sure accel output is turned on, also controls decimation of accel output reg + fifo
   Wire.write(accel_control6);
-  Wire.write(192); 
+  Wire.write(192); // 11000000, first three digits select Output data rate, current = 952 Hz, which is later averaged over 10
   Wire.write(accel_control7);
-  Wire.write(196); 
+  Wire.write(196); //currently using high resolution mode 
+  Wire.write(fifo_ctrl);
+  Wire.write(192);
 	
   Wire.endTransmission();
 }
@@ -133,7 +143,7 @@ void getI2CData()
   rawaccelx = convert_16bit(aX0, aX1);
   rawaccely = convert_16bit(aY0, aY1);
   rawaccelz = convert_16bit(aZ0, aZ1);
-
+  
   convgyrox = gyro_conversion(rawgyrox);
   convgyroy = gyro_conversion(rawgyroy);
   convgyroz = gyro_conversion(rawgyroz);
@@ -141,7 +151,7 @@ void getI2CData()
   convaccelx = accel_conversion(rawaccelx);
   convaccely = accel_conversion(rawaccely);
   convaccelz = accel_conversion(rawaccelz);
-
+  
   printData(convaccelx, convaccely, convaccelz, convgyrox, convgyroy, convgyroz);	
 }
 
@@ -160,7 +170,6 @@ float accel_conversion(int16_t rawaccel)
 
 	float conv_factor = .061; //conversion factor for +-2g
 	return (rawaccel * conv_factor) / 1000; //ouputs in standard g's
-	
 }
 
 float gyro_conversion(int16_t rawgyro)
@@ -170,29 +179,68 @@ float gyro_conversion(int16_t rawgyro)
 
 	float conv_factor = 8.75; //conversion factor for +-2g
 	return (rawgyro * conv_factor) / 1000; //ouputs in standard dps
-	
 }
 
 void printData(float accelx, float accely, float accelz, float gyrox, float gyroy, float gyroz)
 {
-/*
-  Serial.print("Gyro X = ");
-  Serial.println(gyrox, 3); //prints 3 decimal places
-  Serial.print("Gyro Y = ");
-  Serial.println(gyroy, 3); //prints 3 decimal places
-  Serial.print("Gyro Z = ");
-  Serial.println(gyroz, 3); //prints 3 decimal places
-*/
 
-  if((accelx > .500 || accelx < -.500) || (accely > .500 || accely < -.500) || (accelz > .500 || accelz < -.500)) //temporary filter for bad data
+  //calculates running avg and prints out every 10 times
+  if(count >= 5)
   {
- 	Serial.print("Accel X = ");
-  	Serial.println(accelx, 2); //prints 3 decimal places
+    //accel averages
+    overall_accelx /= 5.0;
+    overall_accely /= 5.0;
+    overall_accelz /= 5.0;
+
+    //gyro averages
+    overall_gyrox /= 5.0;
+    overall_gyroy /= 5.0;
+    overall_gyroz /= 5.0;
+
+    //printing for accel
+ 	  Serial.print("Accel X = ");
+  	Serial.println(overall_accelx, 2); //prints 3 decimal places
   	Serial.print("Accel Y = ");
-  	Serial.println(accely, 2); //prints 3 decimal places
+  	Serial.println(overall_accely, 2); //prints 3 decimal places
   	Serial.print("Accel Z = ");
-  	Serial.println(accelz, 2); //prints 3 decimal places
+  	Serial.println(overall_accelz, 2); //prints 3 decimal places
   	Serial.println("\n\n");
+
+    //printing for gyro
+    /*
+    Serial.print("Gyro X = ");
+    Serial.println(gyrox, 3); //prints 3 decimal places
+    Serial.print("Gyro Y = ");
+    Serial.println(gyroy, 3); //prints 3 decimal places
+    Serial.print("Gyro Z = ");
+    Serial.println(gyroz, 3); //prints 3 decimal places
+    */
+    //resetting the count back to 0 
+    count = 0;
+    overall_accelx = 0.0;
+    overall_accely = 0.0;
+    overall_accelz = 0.0;
+
+    //gyro averages
+    overall_gyrox = 0.0;
+    overall_gyroy = 0.0;
+    overall_gyroz = 0.0;
   }
+
+  else
+  {
+    //create accel total
+    overall_accelx += accelx;
+    overall_accely += accely;
+    overall_accelz += accelz;
+
+    //create gyro total
+    overall_gyrox += gyrox;
+    overall_gyroy += gyroy;
+    overall_gyroz += gyroz;
+
+    count++;
+  }
+  
 
 }

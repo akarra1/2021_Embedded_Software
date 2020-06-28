@@ -3,11 +3,9 @@
    Andrew Kettle
    June 24th, 2020
 */
-
 #include "imu.h"
 
 void setup() {
-
   I2C_init(); //initialize I2C transmission
   Serial.begin(9600);
 }
@@ -15,18 +13,22 @@ void setup() {
 void loop() {
 
   //Reading IMU
-  getI2CData();
+  getI2CData(); //Read IMU in a loop
   Serial.flush();
 }
 
 void I2C_init()
 { 
-  pinMode(scl, 0x2); //Hex for pull up resistor
+  pinMode(scl, 0x2); //Both clock and data line start high in I2C protocol
   pinMode(sda, 0x2);
+  //initialize the overall global values that are used to calculate the overall values
   overall_accelx = overall_accely = overall_accelz = overall_gyrox = overall_gyroy = overall_gyroz = 0.0;
-  Wire.begin(); //initialize i2c transmission
+
+  //I2C intitial transmission begins 
+  Wire.begin(); 
   Wire.beginTransmission(lsm9ds1_ag);
-  //init power modes
+  
+  //Initialize registers
   Wire.write(gyro_control1); //Control register for gyro
   Wire.write(193); //Powers and set to 952 HZ, stock settings elsewhere, trial and error with filtering currently
   Wire.write(accel_control4);
@@ -41,6 +43,7 @@ void I2C_init()
   Wire.write(192);
 	
   Wire.endTransmission();
+  //I2C initial tranmission ends
 }
 
 void getI2CData() 
@@ -69,7 +72,7 @@ void getI2CData()
 
   Wire.requestFrom(lsm9ds1_ag, 12); //requesting 12 bytes, 12 8 bit #'s, or 6 16 bit #'s
   
-  if(Wire.available()<=12) 
+  if(Wire.available()>=12)          //Waits until all of the axes have available data
   { 
     gX0 = Wire.read();
     gX1 = Wire.read();
@@ -135,6 +138,15 @@ float gyro_conversion(int16_t rawgyro)
 
 void printData(float accelx, float accely, float accelz, float gyrox, float gyroy, float gyroz)
 {
+ 	  Serial.print("Accel X = ");
+  	Serial.println(accelx, 2); //prints 3 decimal places
+  	Serial.print("Accel Y = ");
+  	Serial.println(accely, 2); //prints 3 decimal places
+  	Serial.print("Accel Z = ");
+  	Serial.println(accelz, 2); //prints 3 decimal places
+  	Serial.println("\n\n");
+
+  /*
   //calculates running avg and prints out every 10 times
   if(count >= 5)
   {
@@ -183,4 +195,5 @@ void printData(float accelx, float accely, float accelz, float gyrox, float gyro
 
     count++;
   }
+    */
 }

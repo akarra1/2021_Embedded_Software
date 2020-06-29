@@ -1,41 +1,53 @@
 /*
    Written and maintained by: 
    Andrew Kettle
-   November 23rd, 2019
+   June 28th, 2020
 */
-
-//headers:
 #include "imu.h"
-#include "Wire.h"
-#include "Energia.h"
+
+void setup() {
+  I2C_init(); //initialize I2C transmission
+  Serial.begin(9600);
+}
+
+void loop() {
+
+  //Reading IMU
+  getI2CData(); //Read IMU in a loop
+  Serial.flush();
+}
 
 void I2C_init()
 { 
-  //pin declerations
-  int sda = P2_2; //I2C pins
-  int scl = P2_1;
-  pinMode(scl, INPUT_PULLUP);
-  pinMode(sda, INPUT_PULLUP);
-  Wire.begin(); //initialize i2c transmission
+  pinMode(scl, 0x2); //Both clock and data line start high in I2C protocol
+  pinMode(sda, 0x2);
+  //initialize the overall global values that are used to calculate the overall values
+
+  //I2C intitial transmission begins 
+  Wire.begin(); 
   Wire.beginTransmission(lsm9ds1_ag);
-  //init power modes
+  
+  //Initialize registers
   Wire.write(gyro_control1); //Control register for gyro
   Wire.write(193); //Powers and set to 952 HZ, stock settings elsewhere, trial and error with filtering currently
   Wire.write(accel_control4);
-  Wire.write(56); //Makes sure accel output is turned on
-  Wire.write(accel_control5);
-  Wire.write(56); 
+  Wire.write(56); //Makes sure gyro output is turned on
+  Wire.write(accel_control5); //was 56
+  Wire.write(56); //Makes sure accel output is turned on, also controls decimation of accel output reg + fifo
   Wire.write(accel_control6);
-  Wire.write(192); 
+  Wire.write(192); // 11000000, first three digits select Output data rate, current = 952 Hz, which is later averaged over 10
   Wire.write(accel_control7);
-  Wire.write(196);
+  Wire.write(196); //currently using high resolution mode 
+  Wire.write(fifo_ctrl);
+  Wire.write(192);
 	
   Wire.endTransmission();
+  //I2C initial tranmission ends
 }
 
-float *getI2CData(float *imupointer) //check naming and syntax
+void getI2CData() 
 {
-  float rawaccelx, rawaccely, rawaccelz, rawgyrox, rawgyroy, rawgyroz;
+  int16_t rawaccelx, rawaccely, rawaccelz, rawgyrox, rawgyroy, rawgyroz;
   float convaccelx, convaccely, convaccelz, convgyrox, convgyroy, convgyroz;
   int8_t gX0, gX1, gY0, gY1, gZ0, gZ1, aX0, aX1, aY0, aY1, aZ0, aZ1;
 
@@ -59,7 +71,7 @@ float *getI2CData(float *imupointer) //check naming and syntax
 
   Wire.requestFrom(lsm9ds1_ag, 12); //requesting 12 bytes, 12 8 bit #'s, or 6 16 bit #'s
   
-  if(Wire.available()<=12) 
+  if(Wire.available()>=12)          //Waits until all of the axes have available data
   { 
     gX0 = Wire.read();
     gX1 = Wire.read();
@@ -85,7 +97,7 @@ float *getI2CData(float *imupointer) //check naming and syntax
   rawaccelx = convert_16bit(aX0, aX1);
   rawaccely = convert_16bit(aY0, aY1);
   rawaccelz = convert_16bit(aZ0, aZ1);
-
+  
   convgyrox = gyro_conversion(rawgyrox);
   convgyroy = gyro_conversion(rawgyroy);
   convgyroz = gyro_conversion(rawgyroz);
@@ -93,22 +105,11 @@ float *getI2CData(float *imupointer) //check naming and syntax
   convaccelx = accel_conversion(rawaccelx);
   convaccely = accel_conversion(rawaccely);
   convaccelz = accel_conversion(rawaccelz);
-
-  //packing into array
-
-  *(imupointer + 0) = convgyrox;
-  *(imupointer + 1) = convgyroy;
-  *(imupointer + 2) = convgyroz;
-
-  *(imupointer + 3) = convaccelx;
-  *(imupointer + 4) = convaccely;
-  *(imupointer + 5) = convaccelz;
-
-  return imupointer; //check syntax
-	
+  
+  printData(convaccelx, convaccely, convaccelz, convgyrox, convgyroy, convgyroz);	
 }
 
-//converts to 16 bit number
+//converts two separate 8 bit numbers to a 16 bit number
 int16_t convert_16bit(int8_t high, int8_t low)
 {
 	int16_t sixteenbit = (high << 8) | low; 
@@ -123,7 +124,6 @@ float accel_conversion(int16_t rawaccel)
 
 	float conv_factor = .061; //conversion factor for +-2g
 	return (rawaccel * conv_factor) / 1000; //ouputs in standard g's
-	
 }
 
 float gyro_conversion(int16_t rawgyro)
@@ -133,28 +133,15 @@ float gyro_conversion(int16_t rawgyro)
 
 	float conv_factor = 8.75; //conversion factor for +-2g
 	return (rawgyro * conv_factor) / 1000; //ouputs in standard dps
-	
 }
 
 void printData(float accelx, float accely, float accelz, float gyrox, float gyroy, float gyroz)
 {
-
-  Serial.print("Gyro X = ");
-  Serial.println(gyrox, 3); //prints 3 decimal places
-  Serial.print("Gyro Y = ");
-  Serial.println(gyroy, 3); //prints 3 decimal places
-  Serial.print("Gyro Z = ");
-  Serial.println(gyroz, 3); //prints 3 decimal places
-
-  if((accelx > .500 || accelx < -.500) || (accely > .500 || accely < -.500) || (accelz > .500 || accelz < -.500)) //temporary filter for bad data
-  {
- 	Serial.print("Accel X = ");
-  	Serial.println(accelx, 3); //prints 3 decimal places
+ 	  Serial.print("Accel X = ");
+  	Serial.println(accelx, 2); //prints 3 decimal places
   	Serial.print("Accel Y = ");
-  	Serial.println(accely, 3); //prints 3 decimal places
+  	Serial.println(accely, 2); //prints 3 decimal places
   	Serial.print("Accel Z = ");
-  	Serial.println(accelz, 3); //prints 3 decimal places
+  	Serial.println(accelz, 2); //prints 3 decimal places
   	Serial.println("\n\n");
-  }
-
 }

@@ -2,7 +2,7 @@
 Welcome to UCI's Anteater racing software page. This is where all of the embedded software work is done for our EV racecar. 
 
 ### Components
-Central Control Module (CCM)
+Central Control Module (CCM), 
 Suspension Sensor Array (SSA)
 
 The CCM is the main microcontroller for the car. It works as the central hub for anything the car does. Some of its functionalities

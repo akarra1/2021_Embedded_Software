@@ -15,7 +15,6 @@ void printData(float accelx, float accely, float accelz, float gyrox, float gyro
 
 /* variable declerations (globals)*/
 int count = 0;
-float overall_accelx, overall_accely, overall_accelz, overall_gyrox, overall_gyroy, overall_gyroz;
 
 //pin declerations
 int sda = P2_2; //I2C pins

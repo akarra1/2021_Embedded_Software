@@ -1,7 +1,7 @@
 /*
    Written and maintained by: 
    Andrew Kettle
-   June 24th, 2020
+   June 28th, 2020
 */
 #include "imu.h"
 
@@ -22,7 +22,6 @@ void I2C_init()
   pinMode(scl, 0x2); //Both clock and data line start high in I2C protocol
   pinMode(sda, 0x2);
   //initialize the overall global values that are used to calculate the overall values
-  overall_accelx = overall_accely = overall_accelz = overall_gyrox = overall_gyroy = overall_gyroz = 0.0;
 
   //I2C intitial transmission begins 
   Wire.begin(); 
@@ -145,55 +144,4 @@ void printData(float accelx, float accely, float accelz, float gyrox, float gyro
   	Serial.print("Accel Z = ");
   	Serial.println(accelz, 2); //prints 3 decimal places
   	Serial.println("\n\n");
-
-  /*
-  //calculates running avg and prints out every 10 times
-  if(count >= 5)
-  {
-    //accel averages
-    overall_accelx /= 5.0;
-    overall_accely /= 5.0;
-    overall_accelz /= 5.0;
-
-    //gyro averages
-    overall_gyrox /= 5.0;
-    overall_gyroy /= 5.0;
-    overall_gyroz /= 5.0;
-
-    //printing for accel
- 	  Serial.print("Accel X = ");
-  	Serial.println(overall_accelx, 2); //prints 3 decimal places
-  	Serial.print("Accel Y = ");
-  	Serial.println(overall_accely, 2); //prints 3 decimal places
-  	Serial.print("Accel Z = ");
-  	Serial.println(overall_accelz, 2); //prints 3 decimal places
-  	Serial.println("\n\n");
-
-    //resetting the count back to 0 
-    count = 0;
-    overall_accelx = 0.0;
-    overall_accely = 0.0;
-    overall_accelz = 0.0;
-
-    //gyro averages
-    overall_gyrox = 0.0;
-    overall_gyroy = 0.0;
-    overall_gyroz = 0.0;
-  }
-
-  else
-  {
-    //create accel total
-    overall_accelx += accelx;
-    overall_accely += accely;
-    overall_accelz += accelz;
-
-    //create gyro total
-    overall_gyrox += gyrox;
-    overall_gyroy += gyroy;
-    overall_gyroz += gyroz;
-
-    count++;
-  }
-    */
 }

@@ -8,13 +8,10 @@
 //Functions:
 void I2C_init();
 void getI2CData();
-int16_t convert_16bit(int8_t high, int8_t low);
-float accel_conversion(int16_t rawaccel);
+int16_t convert_16bit(int8_t high, uint8_t low);
+float accel_conversion(int16_t rawaccel, int axis);
 float gyro_conversion(int16_t rawgyro);
 void printData(float accelx, float accely, float accelz, float gyrox, float gyroy, float gryoz);
-
-/* variable declerations (globals)*/
-int count = 0;
 
 //pin declerations
 int sda = P2_2; //I2C pins
@@ -28,6 +25,7 @@ int scl = P2_1;
 #define accel_control6 0x20 //Control of the accel reg6
 #define accel_control5 0x1F //Control of the accel reg5
 #define accel_control7 0x21 //Control of the accel reg7
+#define accel_control8 0x22 //Control of the accel reg8, which covers some interrupts and shutdowns
 #define mag_pwr 0x16 //the register that powers the mangetometer
 #define strtw 0xD6 //send before write?
 #define strtr 0xD5
@@ -47,5 +45,7 @@ int scl = P2_1;
 #define accelY1 0x2B
 #define accelZ0 0x2C
 #define accelZ1 0x2D
+
+#define status_reg 0x27
 
 #endif

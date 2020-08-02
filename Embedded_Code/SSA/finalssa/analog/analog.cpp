@@ -1,18 +1,13 @@
 #include "analog.h"
-#include "Energia.h"
-  
+
+/*Written by Andrew Kettle and Jada Berneguer
+  Last modified: August 2nd, 2020
+  Driver for acquiring temperature data from ztp-115m temp sensor 
+*/
 //pin declerations  
-int irpin1 = A3;
-int irpin2 = A1;
-int irpin3 = A2;
-//int sustrv = A3; //analog input for suspension travel, not implemented yet
-
-char irread1;
-char irread2;
-char irread3;
-
-char voltage1, voltage2, voltage3;
-char temp1, temp2, temp3;
+int irpin1 = A0;
+int irpin2 = A3;
+int irpin3 = A4;
 
 void analogSetup() {
   pinMode(irpin1, INPUT);
@@ -20,46 +15,46 @@ void analogSetup() {
   pinMode(irpin3, INPUT);
 }
 
-char* analogData(char *analogarray) { //Reading IR sensors
+void analogData(float *analogarray) { //Reading IR sensors
+  int irread1, irread2, irread3;
+  float temp1, temp2, temp3;
 
   //sensor1
   irread1 = analogRead(irpin1);
-  voltage1 = analogConvert(irread1);
-  temp1 = calcTemp(irread1);
+  temp1 = calcTemp(analogConvert(irread1));
   //sensor2
   irread2 = analogRead(irpin2);
-  voltage2 = analogConvert(irread2);
-  temp2 = calcTemp(irread2);
+  temp2 = calcTemp(analogConvert(irread2));
   //sensor3
   irread3 = analogRead(irpin3);
-  voltage3 = analogConvert(irread3);
-  temp3 = calcTemp(irread3);
+  temp3 = calcTemp(analogConvert(irread3));
 
-  *(analogarray + 0) = temp1; //contigous places in memory
+  *(analogarray + 0) = temp1; //populating values of supplied array
   *(analogarray + 1) = temp2;
-  *(analogarray + 2) = temp3; 
-	
-  return analogarray;
+  *(analogarray + 2) = temp3;
 }
 
-char analogConvert(char readval)
+float analogConvert(int analog_read) //convert analog to Volts
 {
-	return ((readval/255) * 5000);
+  float analog_percentage = analog_read * 5;
+	return (analog_percentage / 1024);
 }
 
-char calcTemp(char aread)
+float calcTemp(float volts)
 {
-  char temperature;
-  char mVolts = analogConvert(aread);
-
-  if(mVolts < 2000)
-  {
-    temperature = (mVolts - 500) / 10; //standard function below 2V
-  }
-  else
-  {
-    char Volts = mVolts / 1000;
-    temperature = (41.413793103448 * Volts) - 29.758620689655; //switch to linear regression of data sheet function after 2V
-  }
+  float temperature = 0;
+  temperature = volts * (48.24) - 51.8; //Line is derived from taking a linear regression of the datasheets temp vs voltage curve (reads a bit higher than true value)
+  temperature = (temperature * 9/5) + 32; //converting to fahrenheit
   return temperature; 
+}
+
+void printAnalogData(float temp1, float temp2, float temp3)
+{
+  Serial.print("Temp1: ");
+  Serial.println(temp1);
+  Serial.print("Temp2: ");
+  Serial.println(temp2);
+  Serial.print("Temp3: ");
+  Serial.println(temp3);
+  Serial.println("\n");
 }

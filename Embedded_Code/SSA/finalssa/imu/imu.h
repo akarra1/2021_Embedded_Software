@@ -7,7 +7,6 @@
    August 1st, 2020
 */
 
-#include "imu.h"
 //headers:
 #include "Wire.h"
 #include "Energia.h"

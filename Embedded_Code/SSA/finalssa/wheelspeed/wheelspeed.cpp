@@ -1,36 +1,36 @@
 /*Component: Suspension System Array
  * Portion: Wheel Speed
  * This code is used to calculate wheel speed.
+ * Written by Leslie Uribe and maintained by Andrew Kettle
  */
 
 #include "wheelspeed.h"
 
-int Read_Hall();
-int initiateTimer();
-int end_Timer();
-int wheel_speed();
 int hall_pin = 13;
 float initial_time = 0;
 float end_time = 0;
 float time_difference = 0;
-
-int w_speed=0;
+int w_speed = 0;
 int KV = 0;
 
-void wheelspeedSetup()
+void wheelspeedSetup() //this function needs to be called everytime wheel speed is called
 {
   /* Hall Sensor Setup*/
   pinMode(hall_pin, INPUT);
+  initial_time = 0;
+  end_time = 0;
+  time_difference = 0;
+  w_speed = 0;
+  KV = 0;
 }
 
 /* function calcs wheel speed */
-float wheelspeedCalc(float time_difference_micro) //delete print statements after testing
+float wheelspeedCalc(float time_difference_micro) 
 {
   /* the tire radius is 18 inches */
   float wheel_diameter = 18;
   float circumf = 0;
   float half_rotation = 0;
-  float time_in_millisecs = 0;
   float wheel_speed_f = 0;
   float hours = 0;
   float miles = 0;
@@ -65,11 +65,12 @@ float getwheelspeedData()
     }
     if(digitalRead(hall_pin) == LOW)
     {
+      delay(200); //try to prevent another false read from the sensor
       end_time = micros();
       //delay(10);
       time_difference = end_time - initial_time;
       wheel_speed_final= wheelspeedCalc(time_difference);
       KV = 0;// resetting variable to 0 to take the initial time 
     }
-   return wheel_speed_final;
+    return wheel_speed_final;
 }

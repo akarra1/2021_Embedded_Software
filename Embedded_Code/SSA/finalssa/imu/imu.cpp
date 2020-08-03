@@ -5,21 +5,13 @@
 */
 #include "imu.h"
 
-void setup() {
-  I2C_init(); //initialize I2C transmission registers
-  Serial.begin(9600);
-}
-
-//take out when integrating
-void loop() { //According to millis(), main loop takes about 1 second, no point in sampling faster than that, so I am currently sampling at 10hz
-  getAccelData(); //Read IMU in a loop
-  getGyroData(); //Read IMU in a loop
-  Serial.flush();
-}
 
 //Initializes I2C transmission and registers
-void I2C_init()
+void IMU_init()
 { 
+  //pin declerations
+  int sda = P2_2; //I2C pins
+  int scl = P2_1;
   pinMode(scl, 0x2); //Both clock and data line start high for I2C protocol
   pinMode(sda, 0x2);
 
@@ -43,7 +35,7 @@ void I2C_init()
   //I2C initial tranmission ends
 }
 
-void getAccelData()
+void getAccelData(float *accelarr)
 {
   int16_t rawaccelx, rawaccely, rawaccelz;
   float convaccelx, convaccely, convaccelz;
@@ -69,10 +61,12 @@ void getAccelData()
   convaccely = accel_conversion(rawaccelx);
   convaccelz = accel_conversion(rawaccelz);
 
-  printAccelData(convaccelx, convaccely, convaccelz);
+  *(accelarr + 0) = convaccelx; //populating values of supplied array
+  *(accelarr + 1) = convaccely;
+  *(accelarr + 2) = convaccelz;
 }
 
-void getGyroData()
+void getGyroData(float *gyroarr)
 {
   int16_t rawgyrox, rawgyroy, rawgyroz;
   float convgyrox, convgyroy, convgyroz;
@@ -97,7 +91,9 @@ void getGyroData()
   convgyroy = gyro_conversion(rawgyroy);
   convgyroz = gyro_conversion(rawgyroz);
 
-  printGyroData(convgyrox, convgyroy, convgyroz);
+  *(gyroarr + 0) = convgyrox; //populating values of supplied array
+  *(gyroarr + 1) = convgyroy;
+  *(gyroarr + 2) = convgyroz;
 }
 
 //converts two separate 8 bit numbers to a 16 bit number

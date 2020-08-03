@@ -1,13 +1,14 @@
 #ifndef _ANALOG_
 #define _ANALOG_
 
-//Functions:
+//headers
 #include "Energia.h"
 
+//Functions:
 void analogSetup();
-char* analogData(char *analogarr);
-char analogConvert(char readval);
-char calcTemp(char aread);
-
+void analogData(float *analogarr);
+float analogConvert(int analog_read);
+float calcTemp(float Volts);
+void printAnalogData(float temp1, float temp2, float temp3); 
 
 #endif

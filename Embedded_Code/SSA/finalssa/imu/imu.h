@@ -12,18 +12,14 @@
 #include "Energia.h"
 
 //Functions:
-void I2C_init();
-void getAccelData();
-void getGyroData(); 
+void IMU_init();
+void getAccelData(float *accelarr);
+void getGyroData(float *gyroarr); 
 int16_t convert_16bit(int8_t high, uint8_t low);
 float accel_conversion(int16_t rawaccel);
 float gyro_conversion(int16_t rawgyro);
 void printAccelData(float convaccelx, float convaccely, float convaccelz);
 void printGyroData(float gyrox, float gyroy, float gyroz);
-
-//pin declerations
-int sda = P2_2; //I2C pins
-int scl = P2_1;
 
 //registers
 #define lsm9ds1_ag 0x6B //device reg, 7 bit address

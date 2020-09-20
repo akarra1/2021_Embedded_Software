@@ -1,17 +1,21 @@
 /*
    Written and maintained by: 
    Andrew Kettle
-   August 1st, 2020
+   September 19th, 2020
 */
-#include "imu.h"
 
+//headers:
+#include "imu.h"
+#include <Wire.h>
+#include <Energia.h>
+
+//pin declerations
+int sda = P2_2; //I2C pins
+int scl = P2_1;
 
 //Initializes I2C transmission and registers
-void IMU_init()
+void IMU::IMU_init()
 { 
-  //pin declerations
-  int sda = P2_2; //I2C pins
-  int scl = P2_1;
   pinMode(scl, 0x2); //Both clock and data line start high for I2C protocol
   pinMode(sda, 0x2);
 
@@ -35,7 +39,7 @@ void IMU_init()
   //I2C initial tranmission ends
 }
 
-void getAccelData(float *accelarr)
+void IMU::getAccelData()
 {
   int16_t rawaccelx, rawaccely, rawaccelz;
   float convaccelx, convaccely, convaccelz;
@@ -61,12 +65,12 @@ void getAccelData(float *accelarr)
   convaccely = accel_conversion(rawaccelx);
   convaccelz = accel_conversion(rawaccelz);
 
-  *(accelarr + 0) = convaccelx; //populating values of supplied array
-  *(accelarr + 1) = convaccely;
-  *(accelarr + 2) = convaccelz;
+  accel_x_axis = convaccelx; //setting private variables
+  accel_y_axis = convaccely;
+  accel_z_axis = convaccelz;
 }
 
-void getGyroData(float *gyroarr)
+void IMU::getGyroData()
 {
   int16_t rawgyrox, rawgyroy, rawgyroz;
   float convgyrox, convgyroy, convgyroz;
@@ -91,13 +95,13 @@ void getGyroData(float *gyroarr)
   convgyroy = gyro_conversion(rawgyroy);
   convgyroz = gyro_conversion(rawgyroz);
 
-  *(gyroarr + 0) = convgyrox; //populating values of supplied array
-  *(gyroarr + 1) = convgyroy;
-  *(gyroarr + 2) = convgyroz;
+  gyro_x_axis = convgyrox; //populating values of supplied array
+  gyro_y_axis = convgyroy;
+  gyro_z_axis = convgyroz;
 }
 
 //converts two separate 8 bit numbers to a 16 bit number
-int16_t convert_16bit(int8_t high, uint8_t low)
+int16_t IMU::convert_16bit(int8_t high, uint8_t low)
 {
 	int16_t sixteenbit = ((high << 8) | low); 
 	return sixteenbit;
@@ -106,7 +110,7 @@ int16_t convert_16bit(int8_t high, uint8_t low)
 //converts the 16 bit int into human understandable data
 //0 for x axis, 1 for y axis, 2 for z axis
 //different axes are used to discern what the offset factor should be
-float accel_conversion(int16_t rawaccel) {
+float IMU::accel_conversion(int16_t rawaccel) {
 	//raw unit is millig's/LSB (mg/LSB)
 	//default sampling is +-2g, list of conversion factors on page 12 of datasheet
 
@@ -114,7 +118,7 @@ float accel_conversion(int16_t rawaccel) {
 	return (rawaccel * conv_factor) / 1000; //ouputs in standard g's
 }
 
-float gyro_conversion(int16_t rawgyro)
+float IMU::gyro_conversion(int16_t rawgyro)
 {
 	//raw unit is millidps/LSB (mdps/LSB)
 	//default sampling is +-245dps, list of conversion factors on page 12 of datasheet
@@ -122,7 +126,7 @@ float gyro_conversion(int16_t rawgyro)
 	return (rawgyro * conv_factor) / 1000; //ouputs in standard dps
 }
 
-void printAccelData(float accelx, float accely, float accelz)
+void IMU::printAccelData(float accelx, float accely, float accelz)
 {
  	  Serial.print("Accel X = ");
   	Serial.println(accelx, 2); //prints 3 decimal places

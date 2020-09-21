@@ -1,29 +1,14 @@
 #ifndef _IMU_
 #define _IMU_
-
 /*
    Written and maintained by: 
    Andrew Kettle
    August 1st, 2020
 */
-
-//headers:
-#include "Wire.h"
-#include "Energia.h"
-
-//Functions:
-void IMU_init();
-void getAccelData(float *accelarr);
-void getGyroData(float *gyroarr); 
-int16_t convert_16bit(int8_t high, uint8_t low);
-float accel_conversion(int16_t rawaccel);
-float gyro_conversion(int16_t rawgyro);
-void printAccelData(float convaccelx, float convaccely, float convaccelz);
-void printGyroData(float gyrox, float gyroy, float gyroz);
+#include <stdint.h>
 
 //registers
 #define lsm9ds1_ag 0x6B //device reg, 7 bit address
-
 #define gyro_control1 0x10 //Control of the gyro reg
 #define accel_control4 0x1E //Control of the accel reg4
 #define accel_control6 0x20 //Control of the accel reg6
@@ -52,5 +37,45 @@ void printGyroData(float gyrox, float gyroy, float gyroz);
 #define accelZ1 0x2D
 
 #define status_reg 0x27
+
+class IMU {
+
+   public:
+      //constuctor
+      IMU() //default constructor
+      {
+         accel_x_axis = 0.0;
+         accel_y_axis = 0.0;
+         accel_z_axis = 0.0;
+         gyro_x_axis = 0.0;
+         gyro_y_axis = 0.0;
+         gyro_z_axis = 0.0;
+      }
+      //Functions:
+      void IMU_init();
+      void getAccelData();
+      void getGyroData(); 
+      int16_t convert_16bit(int8_t high, uint8_t low);
+      float accel_conversion(int16_t rawaccel);
+      float gyro_conversion(int16_t rawgyro);
+      void printAccelData();
+      void printGyroData();
+
+      //getters for specific values
+      float getAccelX() { return accel_x_axis; }
+      float getAccelY() { return accel_y_axis; }
+      float getAccelZ() { return accel_z_axis; }
+      float getGyroX()  { return gyro_x_axis; }
+      float getGyroY()  { return gyro_y_axis; }
+      float getGyroZ()  { return gyro_z_axis; }
+
+   private:
+      float accel_x_axis;
+      float accel_y_axis;
+      float accel_z_axis;
+      float gyro_x_axis;
+      float gyro_y_axis;
+      float gyro_z_axis;
+};
 
 #endif

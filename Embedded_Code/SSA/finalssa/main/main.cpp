@@ -6,26 +6,25 @@
 void printAllData();
 /* main function for calling all of the various SSA functions */
 
-//include all header files
+//global containers
+IMU lsm9ds1;
 float temparr[3] = {0}; 
-float accelarr[3] = {0}; //x, y, z
-float gyroarr[3] = {0}; //x, y, z
 float wheelspeed = 0; 
 
 void setup() //initializes different sensors
 {
 	analogSetup();
-  IMU_init(); //need to intialize IMU connection each time
+  lsm9ds1.IMU_init(); //need to intialize IMU connection each time
 	Serial.begin(9600);
 }
 
 void loop() //Eventually going to want to multithread this so the other threads can make progress while wheel speed delays
 {	
   analogData(&temparr[0]);
-  getAccelData(&accelarr[0]); //Read accel data
-  getGyroData(&gyroarr[0]); //Read gyro data
+  lsm9ds1.getAccelData(); //Read accel data
+  lsm9ds1.getGyroData(); //Read gyro data
 	wheelspeedSetup();
-  while(getwheelspeedData() == 0) { continue; } //waiting for magnet to trigger
+  while(getwheelspeedData() == 0) { continue; } //waiting for magnet to trigger, magnet has to trigger in order for execution to finish
   wheelspeed = getwheelspeedData();
   printAllData();
 }
@@ -41,22 +40,26 @@ void printAllData()
   Serial.println(temparr[2]);
   Serial.println("\n");
 
+  //Accelerometer data
   Serial.print("X axis accel: ");
-  Serial.println(accelarr[0]);
+  Serial.println(lsm9ds1.getAccelX());
   Serial.print("Y axis accel: ");
-  Serial.println(accelarr[1]);
+  Serial.println(lsm9ds1.getAccelY());
   Serial.print("Z axis accel: ");
-  Serial.println(accelarr[2]);
+  Serial.println(lsm9ds1.getAccelZ());
   Serial.println("\n");
 
+  //Gyrometer data
+  Serial.print("X axis accel: ");
   Serial.print("X axis gyro: ");
-  Serial.println(gyroarr[0]);
+  Serial.println(lsm9ds1.getGyroX());
   Serial.print("Y axis gyro: ");
-  Serial.println(gyroarr[1]);
+  Serial.println(lsm9ds1.getGyroY());
   Serial.print("Z axis gyro: ");
-  Serial.println(gyroarr[2]);
+  Serial.println(lsm9ds1.getGyroZ());
   Serial.println("\n");
 
+  //Wheelspeed data
   Serial.print("WheelSpeed: ");
   Serial.println(wheelspeed);
   Serial.println("\n");

@@ -58,8 +58,9 @@ class IMU {
       int16_t convert_16bit(int8_t high, uint8_t low);
       float accel_conversion(int16_t rawaccel);
       float gyro_conversion(int16_t rawgyro);
-      void printAccelData(float convaccelx, float convaccely, float convaccelz);
-      void printGyroData(float gyrox, float gyroy, float gyroz);
+      void printAccelData();
+      void printGyroData();
+
       //getters for specific values
       float getAccelX() { return accel_x_axis; }
       float getAccelY() { return accel_y_axis; }

@@ -31,7 +31,7 @@ void IMU::IMU_init()
   Wire.write(accel_control5); 
   Wire.write(56);            //Makes sure accel output is turned on, also controls decimation of accel output reg + fifo
   Wire.write(accel_control6); 
-  Wire.write(64);            //first three digits select Output data rate, current = 10 Hz, which is later averaged over 10
+  Wire.write(64);            //first three digits select Output data rate, current = 10 Hz
   Wire.write(accel_control7);
   Wire.write(196);           //currently using high resolution mode 
 	
@@ -126,24 +126,26 @@ float IMU::gyro_conversion(int16_t rawgyro)
 	return (rawgyro * conv_factor) / 1000; //ouputs in standard dps
 }
 
-void IMU::printAccelData(float accelx, float accely, float accelz)
+/*
+void IMU::printAccelData()
 {
  	  Serial.print("Accel X = ");
-  	Serial.println(accelx, 2); //prints 3 decimal places
+  	Serial.println(accel_x_axis, 2); //prints 3 decimal places
   	Serial.print("Accel Y = ");
-  	Serial.println(accely, 2); //prints 3 decimal places
+  	Serial.println(accel_y_axis, 2); //prints 3 decimal places
   	Serial.print("Accel Z = ");
-  	Serial.println(accelz, 2); //prints 3 decimal places
+  	Serial.println(accel_z_axis, 2); //prints 3 decimal places
   	Serial.println("\n");
 }
 
-void printGyroData(float gyrox, float gyroy, float gyroz)
+void IMU::printGyroData()
 {
  	  Serial.print("gyro X = ");
-  	Serial.println(gyrox, 2); //prints 3 decimal places
+  	Serial.println(gyro_x_axis, 2); //prints 3 decimal places
   	Serial.print("gyro Y = ");
-  	Serial.println(gyroy, 2); //prints 3 decimal places
+  	Serial.println(gyro_y_axis, 2); //prints 3 decimal places
   	Serial.print("gyro Z = ");
-  	Serial.println(gyroz, 2); //prints 3 decimal places
+  	Serial.println(gyro_z_axis, 2); //prints 3 decimal places
   	Serial.println("\n");
 }
+*/

@@ -1,29 +1,27 @@
 /*
    Written and maintained by: 
    Andrew Kettle
-   September 19th, 2020
+   September 21th, 2020
 */
 
 //headers:
 #include "imu.h"
-#include <Wire.h>
-#include <Energia.h>
+#include <i2c_t3.h>
+#include <Arduino.h>
 
-//pin declerations
-int sda = P2_2; //I2C pins
-int scl = P2_1;
+//pin declerations, deprecated
+//uint8_t sda = 18; //I2C pins
+//uint8_t scl = 19;
 
 //Initializes I2C transmission and registers
 void IMU::IMU_init()
 { 
-  pinMode(scl, 0x2); //Both clock and data line start high for I2C protocol
-  pinMode(sda, 0x2);
 
   //I2C intitial transmission begins 
-  Wire.begin(); 
+  Wire.begin(); //implies I2C0 bus, pins 18 and 19  
   Wire.beginTransmission(lsm9ds1_ag);
   
-  //Initialize registers
+  //Initialize registers for IMU
   Wire.write(gyro_control1); //Control register for gyro
   Wire.write(193);           //Powers and set to 952 HZ, stock settings elsewhere (sampling faster helped the gyro but not the accel) 
   Wire.write(accel_control4);
@@ -35,8 +33,8 @@ void IMU::IMU_init()
   Wire.write(accel_control7);
   Wire.write(196);           //currently using high resolution mode 
 	
-  Wire.endTransmission();
   //I2C initial tranmission ends
+  Wire.endTransmission();
 }
 
 void IMU::getAccelData()
@@ -126,7 +124,6 @@ float IMU::gyro_conversion(int16_t rawgyro)
 	return (rawgyro * conv_factor) / 1000; //ouputs in standard dps
 }
 
-/*
 void IMU::printAccelData()
 {
  	  Serial.print("Accel X = ");
@@ -148,4 +145,3 @@ void IMU::printGyroData()
   	Serial.println(gyro_z_axis, 2); //prints 3 decimal places
   	Serial.println("\n");
 }
-*/

@@ -1,7 +1,8 @@
 #include "imu.h"
+#include "sd.h"
 #include "analog.h"
 #include "wheelspeed.h"
-#include "Energia.h"
+#include <Arduino.h>
 
 void printAllData();
 /* main function for calling all of the various SSA functions */
@@ -13,20 +14,26 @@ float wheelspeed = 0;
 
 void setup() //initializes different sensors
 {
+	Serial.begin(9600);
 	analogSetup();
   lsm9ds1.IMU_init(); //need to intialize IMU connection each time
-	Serial.begin(9600);
+  if(!initSD()) { 
+    Serial.print("SD initialization failed");  
+  }
 }
 
 void loop() //Eventually going to want to multithread this so the other threads can make progress while wheel speed delays
 {	
   analogData(&temparr[0]);
   lsm9ds1.getAccelData(); //Read accel data
-  lsm9ds1.getGyroData(); //Read gyro data
-	wheelspeedSetup();
-  while(getwheelspeedData() == 0) { continue; } //waiting for magnet to trigger, magnet has to trigger in order for execution to finish
-  wheelspeed = getwheelspeedData();
+  //lsm9ds1.getGyroData(); //Read gyro data
+  //lsm9ds1.printAccelData();
+//	wheelspeedSetup();
+//  while(getwheelspeedData() == 0) { continue; } //waiting for magnet to trigger, magnet has to trigger in order for execution to finish
+//  wheelspeed = getwheelspeedData();
   printAllData();
+  SdWrite(lsm9ds1);
+  delay(100);
 }
 
 void printAllData()
@@ -40,6 +47,7 @@ void printAllData()
   Serial.println(temparr[2]);
   Serial.println("\n");
 
+  /*
   //Accelerometer data
   Serial.print("X axis accel: ");
   Serial.println(lsm9ds1.getAccelX());
@@ -58,9 +66,10 @@ void printAllData()
   Serial.print("Z axis gyro: ");
   Serial.println(lsm9ds1.getGyroZ());
   Serial.println("\n");
-
+  
   //Wheelspeed data
   Serial.print("WheelSpeed: ");
   Serial.println(wheelspeed);
   Serial.println("\n");
+  */
 }

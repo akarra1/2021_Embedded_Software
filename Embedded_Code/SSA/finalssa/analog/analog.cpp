@@ -1,13 +1,15 @@
-#include "analog.h"
-
 /*Written by Andrew Kettle and Jada Berneguer
   Last modified: August 2nd, 2020
   Driver for acquiring temperature data from ztp-115m temp sensor 
 */
+//headers
+#include "analog.h"
+#include <Arduino.h>
+
 //pin declerations  
-int irpin1 = A0;
-int irpin2 = A3;
-int irpin3 = A4;
+int irpin1 = A16;
+int irpin2 = A15;
+int irpin3 = A14;
 
 void analogSetup() {
   pinMode(irpin1, INPUT);
@@ -29,21 +31,21 @@ void analogData(float *analogarray) { //Reading IR sensors
   irread3 = analogRead(irpin3);
   temp3 = calcTemp(analogConvert(irread3));
 
-  *(analogarray + 0) = temp1; //populating values of supplied array
-  *(analogarray + 1) = temp2;
+  *(analogarray + 0) = irread1; //populating values of supplied array
+  *(analogarray + 1) = irread2;
   *(analogarray + 2) = temp3;
 }
 
 float analogConvert(int analog_read) //convert analog to Volts
 {
-  float analog_percentage = analog_read * 5;
-	return (analog_percentage / 1024);
+  float analog_percentage = analog_read * 3.3; //relative to 3.3v
+	return (analog_percentage / 1023);
 }
 
 float calcTemp(float volts)
 {
   float temperature = 0;
-  temperature = volts * (48.24) - 51.8; //Line is derived from taking a linear regression of the datasheets temp vs voltage curve (reads a bit higher than true value)
+  temperature = volts * (48.24) - 51.8; //Line is derived from taking a linear regression of the datasheets temp vs voltage curve 
   temperature = (temperature * 9/5) + 32; //converting to fahrenheit
   return temperature; 
 }

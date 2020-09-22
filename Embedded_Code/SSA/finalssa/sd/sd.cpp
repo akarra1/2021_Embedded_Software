@@ -1,19 +1,36 @@
 /*
    Written and maintained by: 
    Andrew Kettle
-   September 20th, 2020
+   September 22nd, 2020
 */
 
+#include <SdFat.h>
+#include <Arduino.h>
 #include "sd.h"
 
-//pins for USCI_B0 -> Datasheet page 6
-uint8_t mosi = P1_7; 
-uint8_t miso = P1_6;
-uint8_t cs = P1_4; 
-uint8_t sck = P1_5; 
+//SD card object
+SdFatSdio SD; 
+File file;
 
-void spi_init()
+bool initSD()
 {
-    //using USCI_B0
+   if(!SD.begin()) {
+      return false;     
+   }
+   return true;
+}
 
+void SdWrite(IMU imu)
+{
+   //check and remove existing file
+   file = SD.open("data.csv", FILE_WRITE);
+   file.print("Hello John\n");
+   SdClose();
+   //write data formatted to csv
+}
+
+void SdClose()
+{
+   //close file
+   file.close();
 }

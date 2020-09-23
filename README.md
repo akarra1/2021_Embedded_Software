@@ -3,7 +3,8 @@ Welcome to UCI's Anteater racing software page. This is where all of the embedde
 
 ### Components
 Central Control Module (CCM), 
-Suspension Sensor Array (SSA)
+Suspension Sensor Array (SSA),
+Data Acquisition Script (DAS)
 
 The CCM is the main microcontroller for the car. It works as the central hub for anything the car does. Some of its functionalities
 include taking in car based inputs (steering, brake, throttle), controlling the motors, and grabbing data from the SSA.

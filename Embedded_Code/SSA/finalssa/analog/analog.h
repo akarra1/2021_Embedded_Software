@@ -1,9 +1,6 @@
 #ifndef _ANALOG_
 #define _ANALOG_
 
-//headers
-#include "Energia.h"
-
 //Functions:
 void analogSetup();
 void analogData(float *analogarr);

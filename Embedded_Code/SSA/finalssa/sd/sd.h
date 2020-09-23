@@ -9,7 +9,8 @@
 #include "imu.h"
 
 bool initSD();
+void SdRemove();
 void SdClose();
-void SdWrite(IMU imu);
+bool SdWrite(IMU imu, float t1, float t2, float t3, float ws);
 
 #endif

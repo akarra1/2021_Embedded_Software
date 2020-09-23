@@ -31,8 +31,8 @@ void analogData(float *analogarray) { //Reading IR sensors
   irread3 = analogRead(irpin3);
   temp3 = calcTemp(analogConvert(irread3));
 
-  *(analogarray + 0) = irread1; //populating values of supplied array
-  *(analogarray + 1) = irread2;
+  *(analogarray + 0) = temp1; //populating values of supplied array
+  *(analogarray + 1) = temp2;
   *(analogarray + 2) = temp3;
 }
 

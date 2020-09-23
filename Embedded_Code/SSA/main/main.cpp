@@ -9,6 +9,7 @@ void printAllData();
 
 //global containers
 IMU lsm9ds1;
+SD sdcard;
 float temparr[3] = {0}; 
 float wheelspeed = 0; 
 
@@ -17,10 +18,11 @@ void setup() //initializes different sensors
 	Serial.begin(9600);
 	analogSetup();
   lsm9ds1.IMU_init(); //need to intialize IMU connection each time
-  if(!initSD()) { 
+  if(!sdcard.initSD()) { 
     Serial.print("SD initialization failed");  
+  } else {
+    sdcard.setSDState(true);
   }
-  SdRemove(); //removes existing file
 }
 
 void loop() //Eventually going to want to multithread this so the other threads can make progress while wheel speed delays
@@ -33,8 +35,8 @@ void loop() //Eventually going to want to multithread this so the other threads 
   wheelspeed = getwheelspeedData();
 //  printAllData();
   
-  if(!SdWrite(lsm9ds1, temparr[0], temparr[1], temparr[2], 0.0)) { 
-    Serial.print("Couldn't open sd card");  
+  if(!sdcard.SdWrite(lsm9ds1, temparr[0], temparr[1], temparr[2], 0.0)) { 
+    Serial.print("Couldn't open file for writing");  
   }
   delay(100);
 }

@@ -28,14 +28,17 @@ int SD::getFname()
    tempf.close();
 
    //increment for the next log
-   tempf = SDCARD.open("fname.txt", FILE_WRITE);
-   file.seek(0); //seek to the beginning of the file since its only a character
-   if(n+1 > 9) { //only keeping 10 data logs, 0-9 so that character logic doesn't need to change into string as well
-      n = -1;
+   if(!isSdOpen)
+   {
+      tempf = SDCARD.open("fname.txt", FILE_WRITE);
+      file.seek(0); //seek to the beginning of the file since its only a character
+      if(n+1 > 9) { //only keeping 10 data logs, 0-9 so that character logic doesn't need to change into string as well
+         n = -1; //-1 because it is soon incremented
+      }
+      char to_write = char(n+1);
+      file.print(to_write);
+      tempf.close();
    }
-   char to_write = char(n+1);
-   file.print(to_write);
-   tempf.close();
    return n; //if EOF, -1 is returned so pass it on regardless
 }
 
@@ -63,7 +66,7 @@ bool SD::SdWrite(IMU imu, float t1, float t2, float t3, float ws)
       sprintf(fstr, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n", imu.getAccelX(), imu.getAccelY(), imu.getAccelZ(),\
       imu.getGyroX(), imu.getGyroY(), imu.getGyroZ(), t1, t2, t3, ws); //formatting string
       file.seek(EOF); //gets to end of file so append occurs
-      file.println(fstr); //printing to string
+      file.print(fstr); //printing to string
    }
    SdClose(); //opening and closing file each time to minimize risk of corruption due to unfortunate shutdown
    //TODO: Receive CAN signal from CCM before shutdown so file can be closed / opened only once
@@ -81,7 +84,7 @@ bool SD::getSDState()
    return isSdOpen;
 }
 
-bool SD::setSDState(bool st)
+void SD::setSDState(bool st)
 {
    isSdOpen = st;
 }

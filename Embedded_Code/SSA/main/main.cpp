@@ -10,34 +10,39 @@ void printAllData();
 //global containers
 IMU lsm9ds1;
 SD sdcard;
-float temparr[3] = {0}; 
+IRsensors temp;
 float wheelspeed = 0; 
 
 void setup() //initializes different sensors
 {
 	Serial.begin(9600);
-	analogSetup();
+	temp.analogSetup();
   lsm9ds1.IMU_init(); //need to intialize IMU connection each time
   if(!sdcard.initSD()) { 
     Serial.print("SD initialization failed");  
-  } else {
-    sdcard.setSDState(true);
-  }
+  } 
 }
 
 void loop() //Eventually going to want to multithread this so the other threads can make progress while wheel speed delays
 {	
-  analogData(&temparr[0]);
+  static int count = 0;
+  temp.analogData(); //reads data
   lsm9ds1.getAccelData(); //Read accel data
   lsm9ds1.getGyroData(); //Read gyro data
 	wheelspeedSetup();
-  while(getwheelspeedData() == 0) { continue; } //waiting for magnet to trigger, magnet has to trigger in order for execution to finish
-  wheelspeed = getwheelspeedData();
+//  while(getwheelspeedData() == 0) { continue; } //waiting for magnet to trigger, magnet has to trigger in order for execution to finish
+//  wheelspeed = getwheelspeedData();
 //  printAllData();
   
-  if(!sdcard.SdWrite(lsm9ds1, temparr[0], temparr[1], temparr[2], 0.0)) { 
+  if(!sdcard.SdWrite(lsm9ds1, temp.getTemps(1), temp.getTemps(2), temp.getTemps(3), 0.0)) { 
     Serial.print("Couldn't open file for writing");  
   }
+  //change state for the SD card
+  if(count > 0) {
+    sdcard.setSDState(true);
+  }
+  count++; 
+  //temporary delay for serial line during devlopment
   delay(100);
 }
 
@@ -45,11 +50,11 @@ void printAllData()
 {
   //Temperature data
   Serial.print("Temp1: ");
-  Serial.println(temparr[0]);
+  Serial.println(temp.getTemps(1));
   Serial.print("Temp2: ");
-  Serial.println(temparr[1]);
+  Serial.println(temp.getTemps(2));
   Serial.print("Temp3: ");
-  Serial.println(temparr[2]);
+  Serial.println(temp.getTemps(3));
   Serial.println("\n");
 
   //Accelerometer data

@@ -22,7 +22,7 @@ class SD {
       int getFname();
       bool SdWrite(IMU imu, float t1, float t2, float t3, float ws);
       bool getSDState();
-      bool setSDState(bool st);
+      void setSDState(bool st);
 
    private:
       bool isSdOpen;

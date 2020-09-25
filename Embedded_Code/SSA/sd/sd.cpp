@@ -4,19 +4,20 @@
    September 22nd, 2020
 */
 
-#include <SdFat.h>
 #include <Arduino.h>
 #include "sd.h"
-
-//SD card object
-SdFatSdio SDCARD; 
-File file;
 
 bool SD::initSD()
 {
    if(!SDCARD.begin()) {
       return false;     
    }
+   //get the correct file character
+   int fnum = getFname();
+   if(fnum == -1) {
+      fnum = 48; //set to append to default log if there is an error (ascii 0 = 48)
+   }
+   setFileNum(fnum);
    return true;
 }
 
@@ -24,59 +25,57 @@ int SD::getFname()
 {
    //get number from file
    File tempf = SDCARD.open("fname.txt", FILE_READ);
-   int n = tempf.read();
+   tempf.seek(0); //seek to the beginning of the file since its only a character
+   int n = tempf.read(); //reads byte = 8 bits, char is 255 (8 bits) tf: next byte is next char returned in integer ascii
    tempf.close();
 
-   //increment for the next log
-   if(!isSdOpen)
-   {
-      tempf = SDCARD.open("fname.txt", FILE_WRITE);
-      file.seek(0); //seek to the beginning of the file since its only a character
-      if(n+1 > 9) { //only keeping 10 data logs, 0-9 so that character logic doesn't need to change into string as well
-         n = -1; //-1 because it is soon incremented
-      }
-      char to_write = char(n+1);
-      file.print(to_write);
-      tempf.close();
+   //increment for the next log, allows for 10 different data logs to be stored at a given time
+   tempf = SDCARD.open("fname.txt", FILE_WRITE);
+   tempf.seek(0); //seek to the beginning of the file since its only a character
+   //57 is ascii 9
+   if(n+1 > 57) { //only keeping 10 data logs, 0-9 so that character logic doesn't need to change into string as well
+      n = 48; //0 starting gets incremented into a 1
    }
-   return n; //if EOF, -1 is returned so pass it on regardless
+   int u = n+1;
+   char to_write = char(u);
+   tempf.print(to_write);
+   tempf.close();
+
+   return u; //if EOF, -1 is returned so pass it on regardless
 }
 
-void SdRemove()
+void SD::SdRemove()
 {
    SDCARD.remove("data.csv");
 }
 
 bool SD::SdWrite(IMU imu, float t1, float t2, float t3, float ws)
 {
-   //check for new file name 
-   int fnum = getFname();
-   if(fnum==-1) {
-      fnum = 48; //set to append to default log if there is an error (ascii 0 = 48)
-   }
-
-   char num = char(fnum); //cast int to char
+   File file;
+   //create file name
+   char num = getFileNum(); //cast int to char
    char file_name[13]; 
    snprintf(file_name, sizeof(file_name), "data_%c.csv", num);
 
-   file = SDCARD.open(file_name, FILE_WRITE);
+   //open or append to file in arduino
+   if(!isSdOpen) {
+      file = SDCARD.open(file_name, FILE_WRITE); //create file and write the first line to it
+   }
+   else {
+      file = SDCARD.open(file_name, O_APPEND & O_RDWR); //opening to read and write in append mode
+   }
+   //write updated data to the file
    if(!file) { return false; }
    else {
-      char fstr[50]; //conservative buffer size
+      char fstr[40]; //conservative buffer size
       sprintf(fstr, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n", imu.getAccelX(), imu.getAccelY(), imu.getAccelZ(),\
       imu.getGyroX(), imu.getGyroY(), imu.getGyroZ(), t1, t2, t3, ws); //formatting string
       file.seek(EOF); //gets to end of file so append occurs
       file.print(fstr); //printing to string
    }
-   SdClose(); //opening and closing file each time to minimize risk of corruption due to unfortunate shutdown
+   file.close(); //opening and closing file each time to minimize risk of corruption due to unfortunate shutdown
    //TODO: Receive CAN signal from CCM before shutdown so file can be closed / opened only once
    return true;
-}
-
-void SD::SdClose()
-{
-   //close file
-   file.close();
 }
 
 bool SD::getSDState()

@@ -1,3 +1,10 @@
+/*
+   Written and maintained by: 
+   Andrew Kettle
+   September 22nd, 2020
+*/
+/* main function for calling all of the various SSA sensors */
+
 #include "imu.h"
 #include "sd.h"
 #include "analog.h"
@@ -5,7 +12,6 @@
 #include <Arduino.h>
 
 void printAllData();
-/* main function for calling all of the various SSA functions */
 
 //global containers
 IMU lsm9ds1;
@@ -15,9 +21,11 @@ float wheelspeed = 0;
 
 void setup() //initializes different sensors
 {
-	Serial.begin(9600);
+	Serial.begin(9600); //beginning serial, default is 12 mbit/s for teensys
+
+  //setting up sensors
 	temp.analogSetup();
-  lsm9ds1.IMU_init(); //need to intialize IMU connection each time
+  lsm9ds1.IMU_init(); 
   if(!sdcard.initSD()) { 
     Serial.print("SD initialization failed");  
   } 
@@ -25,24 +33,25 @@ void setup() //initializes different sensors
 
 void loop() //Eventually going to want to multithread this so the other threads can make progress while wheel speed delays
 {	
-  static int count = 0;
+  static int count = 0; //constrained to loop to make sure scope is correct
   temp.analogData(); //reads data
   lsm9ds1.getAccelData(); //Read accel data
   lsm9ds1.getGyroData(); //Read gyro data
-	wheelspeedSetup();
+//	wheelspeedSetup();
 //  while(getwheelspeedData() == 0) { continue; } //waiting for magnet to trigger, magnet has to trigger in order for execution to finish
 //  wheelspeed = getwheelspeedData();
-//  printAllData();
-  
+
+  //SD card functions
+  if(count == 1) {
+    sdcard.setSDState(true); //change state for the SD card
+  }
   if(!sdcard.SdWrite(lsm9ds1, temp.getTemps(1), temp.getTemps(2), temp.getTemps(3), 0.0)) { 
     Serial.print("Couldn't open file for writing");  
   }
-  //change state for the SD card
-  if(count > 0) {
-    sdcard.setSDState(true);
-  }
-  count++; 
+
   //temporary delay for serial line during devlopment
+  count++; 
+  Serial.println(count);
   delay(100);
 }
 

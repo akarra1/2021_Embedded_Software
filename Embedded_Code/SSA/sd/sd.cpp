@@ -18,6 +18,7 @@ bool SD::initSD()
       fnum = 48; //set to append to default log if there is an error (ascii 0 = 48)
    }
    setFileNum(fnum);
+   createFileName();
    return true;
 }
 
@@ -36,7 +37,7 @@ int SD::getFname()
    if(n+1 > 57) { //only keeping 10 data logs, 0-9 so that character logic doesn't need to change into string as well
       n = 48; //0 starting gets incremented into a 1
    }
-   int u = n+1;
+   int u = n + 1; //incrememnt so the prior log isn't overwritten
    char to_write = char(u);
    tempf.print(to_write);
    tempf.close();
@@ -44,26 +45,20 @@ int SD::getFname()
    return u; //if EOF, -1 is returned so pass it on regardless
 }
 
-void SD::SdRemove()
-{
-   SDCARD.remove("data.csv");
+void SD::createFileName() { //create file name
+   snprintf(file_name, sizeof(file_name), "data_%c.csv", filenum);
 }
 
 bool SD::SdWrite(IMU imu, float t1, float t2, float t3, float ws)
 {
-   File file;
-   //create file name
-   char num = getFileNum(); //cast int to char
-   char file_name[13]; 
-   snprintf(file_name, sizeof(file_name), "data_%c.csv", num);
-
-   //open or append to file in arduino
-   if(!isSdOpen) {
-      file = SDCARD.open(file_name, FILE_WRITE); //create file and write the first line to it
-   }
-   else {
+   //open or append to file depending on state of sd card 
+   if(isSdOpen) {
       file = SDCARD.open(file_name, O_APPEND & O_RDWR); //opening to read and write in append mode
    }
+   else {
+      file = SDCARD.open(file_name, FILE_WRITE); //create file and write the first line to it
+   }
+
    //write updated data to the file
    if(!file) { return false; }
    else {
@@ -71,19 +66,13 @@ bool SD::SdWrite(IMU imu, float t1, float t2, float t3, float ws)
       sprintf(fstr, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n", imu.getAccelX(), imu.getAccelY(), imu.getAccelZ(),\
       imu.getGyroX(), imu.getGyroY(), imu.getGyroZ(), t1, t2, t3, ws); //formatting string
       file.seek(EOF); //gets to end of file so append occurs
-      file.print(fstr); //printing to string
+      file.println(fstr); //printing to string
    }
    file.close(); //opening and closing file each time to minimize risk of corruption due to unfortunate shutdown
    //TODO: Receive CAN signal from CCM before shutdown so file can be closed / opened only once
    return true;
 }
 
-bool SD::getSDState()
-{
-   return isSdOpen;
-}
-
-void SD::setSDState(bool st)
-{
-   isSdOpen = st;
+void SD::SdRemove() {
+   SDCARD.remove("data.csv");
 }

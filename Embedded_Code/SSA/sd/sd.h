@@ -10,6 +10,7 @@
 #include "imu.h"
 
 class SD {
+
    public:
       SD()
       {
@@ -23,15 +24,17 @@ class SD {
       void SdClose();
       int getFname();
       bool SdWrite(IMU imu, float t1, float t2, float t3, float ws);
-      bool getSDState();
-      void setSDState(bool st);
-      void setFileNum(int f) { filenum = char(f); }
       char getFileNum() { return filenum; }
+      void setFileNum(int f) { filenum = char(f); }
+      bool getSDState() { return isSdOpen; }
+      void setSDState(bool st) { isSdOpen = st; }
+      void createFileName();
 
    private:
+      SdFatSdio SDCARD; //SD card object
+      File file;
       bool isSdOpen;
-      //SD card object
-      SdFatSdio SDCARD; 
       char filenum;
+      char file_name[13]; //small buffer size
 };
 #endif

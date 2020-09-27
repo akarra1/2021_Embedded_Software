@@ -49,21 +49,21 @@ void SD::createFileName() { //create file name
    snprintf(file_name, sizeof(file_name), "data_%c.csv", filenum);
 }
 
+//bool SD::SdWrite(IMU imu, float t1, float t2, float t3, float ws)
 bool SD::SdWrite(IMU imu, float t1, float t2, float t3, float ws)
 {
    //open or append to file depending on state of sd card 
    if(isSdOpen) {
-      file = SDCARD.open(file_name, O_APPEND & O_RDWR); //opening to read and write in append mode
+      file = SDCARD.open(file_name, O_APPEND | O_RDWR); //opening to read and write in append mode
    }
    else {
       file = SDCARD.open(file_name, FILE_WRITE); //create file and write the first line to it
    }
-
    //write updated data to the file
    if(!file) { return false; }
    else {
-      char fstr[40]; //conservative buffer size
-      sprintf(fstr, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n", imu.getAccelX(), imu.getAccelY(), imu.getAccelZ(),\
+      char fstr[120]; //conservative buffer size
+      sprintf(fstr, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f", imu.getAccelX(), imu.getAccelY(), imu.getAccelZ(),\
       imu.getGyroX(), imu.getGyroY(), imu.getGyroZ(), t1, t2, t3, ws); //formatting string
       file.seek(EOF); //gets to end of file so append occurs
       file.println(fstr); //printing to string

@@ -33,26 +33,30 @@ void setup() //initializes different sensors
 
 void loop() //Eventually going to want to multithread this so the other threads can make progress while wheel speed delays
 {	
-  static int count = 0; //constrained to loop to make sure scope is correct
+  //static count used to switch sd card state
+  static int count = 0; 
+
+  //get analog data
   temp.analogData(); //reads data
+
+  //get IMU data
   lsm9ds1.getAccelData(); //Read accel data
   lsm9ds1.getGyroData(); //Read gyro data
+
+  //get wheelspeed data (currently untested)
 //	wheelspeedSetup();
 //  while(getwheelspeedData() == 0) { continue; } //waiting for magnet to trigger, magnet has to trigger in order for execution to finish
 //  wheelspeed = getwheelspeedData();
 
-  //SD card functions
+  //Log to SD card
   if(count == 1) {
     sdcard.setSDState(true); //change state for the SD card
   }
   if(!sdcard.SdWrite(lsm9ds1, temp.getTemps(1), temp.getTemps(2), temp.getTemps(3), 0.0)) { 
-    Serial.print("Couldn't open file for writing");  
+    Serial.print("Couldn't open file for writing ");  
   }
-
-  //temporary delay for serial line during devlopment
   count++; 
-  Serial.println(count);
-  delay(100);
+  delay(100); //temporary delay for serial line during devlopment
 }
 
 void printAllData()

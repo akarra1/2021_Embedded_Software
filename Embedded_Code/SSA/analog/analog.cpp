@@ -11,38 +11,33 @@ int irpin1 = A16;
 int irpin2 = A15;
 int irpin3 = A14;
 
-void analogSetup() {
+void IRsensors::analogSetup() {
   pinMode(irpin1, INPUT);
   pinMode(irpin2, INPUT);
   pinMode(irpin3, INPUT);
 }
 
-void analogData(float *analogarray) { //Reading IR sensors
+void IRsensors::analogData() { //Reading IR sensors
   int irread1, irread2, irread3;
-  float temp1, temp2, temp3;
 
-  //sensor1
+  //read raw values
   irread1 = analogRead(irpin1);
-  temp1 = calcTemp(analogConvert(irread1));
-  //sensor2
   irread2 = analogRead(irpin2);
-  temp2 = calcTemp(analogConvert(irread2));
-  //sensor3
   irread3 = analogRead(irpin3);
-  temp3 = calcTemp(analogConvert(irread3));
 
-  *(analogarray + 0) = temp1; //populating values of supplied array
-  *(analogarray + 1) = temp2;
-  *(analogarray + 2) = temp3;
+  //caclculating actual temperatures (in F)
+  temps[0] = calcTemp(analogConvert(irread1));
+  temps[1] = calcTemp(analogConvert(irread2));
+  temps[2] = calcTemp(analogConvert(irread3));
 }
 
-float analogConvert(int analog_read) //convert analog to Volts
+float IRsensors::analogConvert(int analog_read) //convert analog to Volts
 {
   float analog_percentage = analog_read * 3.3; //relative to 3.3v
 	return (analog_percentage / 1023);
 }
 
-float calcTemp(float volts)
+float IRsensors::calcTemp(float volts)
 {
   float temperature = 0;
   temperature = volts * (48.24) - 51.8; //Line is derived from taking a linear regression of the datasheets temp vs voltage curve 
@@ -50,7 +45,7 @@ float calcTemp(float volts)
   return temperature; 
 }
 
-void printAnalogData(float temp1, float temp2, float temp3)
+void IRsensors::printAnalogData(float temp1, float temp2, float temp3)
 {
   Serial.print("Temp1: ");
   Serial.println(temp1);

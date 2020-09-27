@@ -1,3 +1,10 @@
+/*
+   Written and maintained by: 
+   Andrew Kettle
+   September 22nd, 2020
+*/
+/* main function for calling all of the various SSA sensors */
+
 #include "imu.h"
 #include "sd.h"
 #include "analog.h"
@@ -5,49 +12,62 @@
 #include <Arduino.h>
 
 void printAllData();
-/* main function for calling all of the various SSA functions */
 
 //global containers
 IMU lsm9ds1;
-float temparr[3] = {0}; 
+SD sdcard;
+IRsensors temp;
 float wheelspeed = 0; 
 
 void setup() //initializes different sensors
 {
-	Serial.begin(9600);
-	analogSetup();
-  lsm9ds1.IMU_init(); //need to intialize IMU connection each time
-  if(!initSD()) { 
+	Serial.begin(9600); //beginning serial, default is 12 mbit/s for teensys
+
+  //setting up sensors
+	temp.analogSetup();
+  lsm9ds1.IMU_init(); 
+  if(!sdcard.initSD()) { 
     Serial.print("SD initialization failed");  
-  }
-  SdRemove(); //removes existing file
+  } 
 }
 
 void loop() //Eventually going to want to multithread this so the other threads can make progress while wheel speed delays
 {	
-  analogData(&temparr[0]);
+  //static count used to switch sd card state
+  static int count = 0; 
+
+  //get analog data
+  temp.analogData(); //reads data
+
+  //get IMU data
   lsm9ds1.getAccelData(); //Read accel data
   lsm9ds1.getGyroData(); //Read gyro data
-	wheelspeedSetup();
-  while(getwheelspeedData() == 0) { continue; } //waiting for magnet to trigger, magnet has to trigger in order for execution to finish
-  wheelspeed = getwheelspeedData();
-//  printAllData();
-  
-  if(!SdWrite(lsm9ds1, temparr[0], temparr[1], temparr[2], 0.0)) { 
-    Serial.print("Couldn't open sd card");  
+
+  //get wheelspeed data (currently untested)
+//	wheelspeedSetup();
+//  while(getwheelspeedData() == 0) { continue; } //waiting for magnet to trigger, magnet has to trigger in order for execution to finish
+//  wheelspeed = getwheelspeedData();
+
+  //Log to SD card
+  if(count == 1) {
+    sdcard.setSDState(true); //change state for the SD card
   }
-  delay(100);
+  if(!sdcard.SdWrite(lsm9ds1, temp.getTemps(1), temp.getTemps(2), temp.getTemps(3), 0.0)) { 
+    Serial.print("Couldn't open file for writing ");  
+  }
+  count++; 
+  delay(100); //temporary delay for serial line during devlopment
 }
 
 void printAllData()
 {
   //Temperature data
   Serial.print("Temp1: ");
-  Serial.println(temparr[0]);
+  Serial.println(temp.getTemps(1));
   Serial.print("Temp2: ");
-  Serial.println(temparr[1]);
+  Serial.println(temp.getTemps(2));
   Serial.print("Temp3: ");
-  Serial.println(temparr[2]);
+  Serial.println(temp.getTemps(3));
   Serial.println("\n");
 
   //Accelerometer data

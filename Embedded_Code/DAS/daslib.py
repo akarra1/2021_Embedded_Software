@@ -15,26 +15,31 @@ def getargs():
     parser.add_argument('--csv', dest="csvfile", action='store', help="CSV file name with .csv extension")
     parser.add_argument('--sensor', dest="sensor", action='store', help="Available options: all, imu, temp, or wheelspeed")
     parser.add_argument('--function', dest="function", action='store', help="Available options: raw, absmax, absmin, avg, relmax, relmin")
-    parser.add_argument('--display', dest="display", action='store', help='Available options: normal') #maybe add items to this later
+    parser.add_argument('--view', dest="view", action='store', help="Available options: standard") #maybe add items to this later
 
-    if(len(sys.argv) < 8):
+    if(len(sys.argv) < 9):
+        print(len(sys.argv))
         print("Incorrect command line usage, the correct usage is on the line below\n")
-        print("python3 das.py --sensor <SENSOR> --function <FUNCTION> --display <DISPLAY>\n")
-        print("An example would be: python3 das.py --sensor imu --function raw --display normal")
+        print("python3 das.py --csv <file> --sensor <SENSOR> --function <FUNCTION> --view <VIEW>\n")
+        print("An example would be: python3 das.py --csv file --sensor imu --function raw --view normal")
         exit() #quits if the arguments are invalid
     else:
         args = parser.parse_args()
         return args
 
-def getdf(filename):
-    df = pd.read_csv(filename)
+def getdf(filename, headernames):
+    df = pd.read_csv(filename, names=headernames)
     return df
    
 def filterSensor(df, sensor):
     if(sensor=='all'):
-        return df           #leaves df unchagned 
-    else:
-        return df['sensor'] #filters for desired sensor 
+        return df #leaves df unchagned 
+    elif(sensor=='imu'):
+        return df[["Accel_X", "Accel_Y", "Accel_Z", "Gyro_X", "Gyro_Y", "Gyro_Z"]] #filters for imu 
+    elif(sensor=='temp'):
+        return df[["IR_1", "IR_2", "IR_3"]] #filters for temp sensors
+    elif(sensor=='wheelspeed'):
+        return df["Wheelspeed"] #filters for wheelspeed 
 
 ####### END INPUT & FILTERING   ########
 

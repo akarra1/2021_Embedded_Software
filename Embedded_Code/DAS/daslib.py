@@ -45,18 +45,24 @@ def filterSensor(df, sensor):
 
 ####### DATA ANALYSIS FUNCTIONS ########
 
-def avg(df, sensor): 
-    return df.sensor.mean()
+def avg(df): 
+    return df.mean()
 
-def relmax(df, sensor):
-    pct = df.pct_change()
-    max_data = pct.sensor[(pct.sensor.shift(-1) > 0) & (pct.sensor.shift(-1) < 0)] #finds relative maximum
-    return max_data
+def relmax(df):
+    mx = pd.DataFrame() #empty dataframe
+    pct = df.pct_change() #calulating percent change and storing in pct
+    for col in df.columns: #iterates over pct to find relative max indecies
+        max_data = (df[col]).index[((pct[col]).shift(-1) > 0) & ((pct[col]).shift(1) < 0)].tolist() #finds relative maxima
+        mx = pd.concat([mx, pd.Series(max_data).rename(col)], axis=1, sort=False)
+    return mx
 
-def relmin(df, sensor):
-    pct = df.pct_change()
-    min_data = pct.sensor[(pct.sensor.shift(-1) < 0) & (pct.sensor.shift(-1) > 0)] #finds relative minimum
-    return min_data
+def relmin(df):
+    mn = pd.DataFrame() #empty dataframe
+    pct = df.pct_change() #calulating percent change and storing in pct
+    for col in df.columns: #iterates over pct to find relative max indecies
+        max_data = (df[col]).index[((pct[col]).shift(-1) < 0) & ((pct[col]).shift(1) > 0)].tolist() #finds relative maxima
+        mn = pd.concat([mn, pd.Series(max_data).rename(col)], axis=1, sort=False)
+    return mn
 
 def absExtremum(data, extype):
     if(extype=="min"):
@@ -69,3 +75,5 @@ def absExtremum(data, extype):
 ####### END DATA ANALYSIS #######
 
 ####### BEGIN VISUALIZATION FUCNTIONS #######
+
+####### END VISUALIZATION FUCNTIONS #######

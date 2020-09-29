@@ -17,9 +17,23 @@ def main():
     df = das.getdf(raw_args.csvfile, headernames) #gets dataframe from csv file
     #filter for desired sensor
     df = das.filterSensor(df, raw_args.sensor)
-    print(df)
-    #df = das.filterSensor(df, raw_args[1])
-    #starting with only one function at a time, will adapt later on   
+
+    func = raw_args.function 
+    f_data = None
+
+    if(func == 'avg'):
+        f_data = das.avg(df)
+    elif(func == 'relmax'): #realtive maximum
+        f_data = das.relmax(df) #going to need to take input here to make it more dyanmic 
+    elif(func == 'relmin'):
+        f_data = das.relmin(df) #going to need to take input here to make it more dyanmic 
+    elif(func == 'absmax'):
+        f_data = das.absExtremum(df, "max")
+    elif(func == 'absmin'):
+        f_data = das.absExtremum(df, "min")
+
+    print(f_data)
+
 
 if __name__ == '__main__':
     main()

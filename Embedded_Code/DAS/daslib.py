@@ -79,15 +79,15 @@ def absExtremum(data, extype):
 ####### BEGIN VISUALIZATION FUCNTIONS #######
 def plotGraph(df, units, *args): #optional parameter expressed in args
 
-    indecies = None        #default value
-    if(args):              #an optional argument exists
-        indecies = args[0] #index for relmax, relmin, max, min
+    indecies = None         #default value
+    if(args):               #an optional argument exists
+        indecies = args[0]  #index for relmax, relmin, max, min
 
     if(not indecies.empty): #creating different plots based on the provided logic
-        for col in df.columns:
-            plt.plot(df[col], label=col) #nested for, hello n^2 my old friend :(
-            for ind in indecies:
-                (df[col])[ind].values.plt.plot(marker='o', markerfacecolor='red', markersize=9)
+        for col, ind in zip(df.columns, indecies):
+            plt.plot(df[col], label=col) 
+            uplist = indecies[ind].dropna().astype('int32').tolist()
+            plt.plot(uplist, df[col][uplist], marker='o', linestyle='None') 
     else:
         for name in df.columns:
             plt.plot(df[name], label=name)
@@ -98,7 +98,4 @@ def plotGraph(df, units, *args): #optional parameter expressed in args
     plt.legend(loc="best")
     plt.show()
 
-        #for col, ind  in zip(df.columns, indecies):
-        #    plt.plot(df[col], label=col)
-        #    plt.plot((df[col])[ind], marker='o', markerfacecolor='red', markersize=12)
 ####### END VISUALIZATION FUCNTIONS #######

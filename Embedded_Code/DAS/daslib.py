@@ -41,7 +41,7 @@ def filterSensor(df, sensor):
     elif(sensor=='temp'):
         return df[["IR_1", "IR_2", "IR_3"]] #filters for temp sensors
     elif(sensor=='wheelspeed'):
-        return df["Wheelspeed"] #filters for wheelspeed 
+        return df[["Wheelspeed"]] #filters for wheelspeed 
 
 ####### END INPUT & FILTERING   ########
 
@@ -54,7 +54,7 @@ def relmax(df):
     mx = pd.DataFrame() #empty dataframe
     pct = df.pct_change() #calulating percent change and storing in pct
     for col in df.columns: #iterates over pct to find relative max indecies
-        max_data = (df[col]).index[((pct[col]).shift(-1) > 0) & ((pct[col]).shift(1) < 0)].tolist() #finds relative maxima
+        max_data = (df[col]).index[((pct[col]).shift(-1) < 0) & ((pct[col]).shift(1) > 0)].tolist() #finds relative maxima
         mx = pd.concat([mx, pd.Series(max_data).rename(col)], axis=1, sort=False)
     return mx
 
@@ -62,7 +62,7 @@ def relmin(df):
     mn = pd.DataFrame() #empty dataframe
     pct = df.pct_change() #calulating percent change and storing in pct
     for col in df.columns: #iterates over pct to find relative max indecies
-        max_data = (df[col]).index[((pct[col]).shift(-1) < 0) & ((pct[col]).shift(1) > 0)].tolist() #finds relative maxima
+        max_data = (df[col]).index[((pct[col]).shift(-1) > 0) & ((pct[col]).shift(1) < 0)].tolist() #finds relative maxima
         mn = pd.concat([mn, pd.Series(max_data).rename(col)], axis=1, sort=False)
     return mn
 
@@ -79,7 +79,7 @@ def absExtremum(data, extype):
 ####### BEGIN VISUALIZATION FUCNTIONS #######
 def plotGraph(df, units, *args): #optional parameter expressed in args
 
-    indecies = None         #default value
+    indecies = []           #default value
     if(args):               #an optional argument exists
         indecies = args[0]  #index for relmax, relmin, max, min
 

@@ -32,14 +32,25 @@ def main():
     elif(func == 'absmin'):
         f_data = das.absExtremum(df, "min")
 
-    if(raw_args.sensor == "accel"):
-        das.plotGraph(df, "Gs", f_data)        #g force
-    elif(raw_args.sensor == 'gyro'):    
-        das.plotGraph(f_data, "Dps")       #degrees per second
-    elif(raw_args.sensor == "temp"):    
-        das.plotGraph(f_data, "Fahrenheit")         #fahrenheit
-    elif(raw_args.sensor == "wheelspeed"):
-        das.plotGraph(f_data, "mph")       #miles per hour
+    if(raw_args.function == "raw"):             #plots raw graphs without optional arguments
+        if(raw_args.sensor == "accel"):
+            das.plotGraph(f_data, "Gs")         #g force
+        elif(raw_args.sensor == 'gyro'):    
+            das.plotGraph(f_data, "Dps")        #degrees per second
+        elif(raw_args.sensor == "temp"):    
+            das.plotGraph(f_data, "Fahrenheit") #fahrenheit
+        elif(raw_args.sensor == "wheelspeed"):
+            das.plotGraph(f_data, "mph")        #miles per hour
+    else:
+        if(raw_args.sensor == "accel"):
+            das.plotGraph(df, "Gs", f_data)         #g force
+        elif(raw_args.sensor == 'gyro'):    
+            das.plotGraph(df, "Dps", f_data)        #degrees per second
+        elif(raw_args.sensor == "temp"):    
+            das.plotGraph(df, "Fahrenheit", f_data) #fahrenheit
+        elif(raw_args.sensor == "wheelspeed"):
+            das.plotGraph(df, "mph", f_data)        #miles per hour
+
 
 if __name__ == '__main__':
     main()

@@ -19,20 +19,41 @@ def main():
     df = das.filterSensor(df, raw_args.sensor)
 
     func = raw_args.function 
-    f_data = None
+    f_data = df #assignment in the event that the user chose raw data
 
+    #a bunch of if elses to satisfy the function argument
     if(func == 'avg'):
         f_data = das.avg(df)
-    elif(func == 'relmax'): #realtive maximum
-        f_data = das.relmax(df) #going to need to take input here to make it more dyanmic 
+    elif(func == 'relmax'):     #realtive maximum
+        f_data = das.relmax(df)  
     elif(func == 'relmin'):
-        f_data = das.relmin(df) #going to need to take input here to make it more dyanmic 
+        f_data = das.relmin(df)  
     elif(func == 'absmax'):
         f_data = das.absExtremum(df, "max")
     elif(func == 'absmin'):
         f_data = das.absExtremum(df, "min")
 
-    print(f_data)
+    #a bunch of if elses to satisfy the sensor argument
+    #broken up becasue the raw data option doesn't need the optional arguments 
+
+    if(raw_args.function == "raw"):             #plots raw graphs without optional arguments
+        if(raw_args.sensor == "accel"):
+            das.plotGraph(f_data, "Gs")         #g force
+        elif(raw_args.sensor == 'gyro'):    
+            das.plotGraph(f_data, "Dps")        #degrees per second
+        elif(raw_args.sensor == "temp"):    
+            das.plotGraph(f_data, "Fahrenheit") #fahrenheit
+        elif(raw_args.sensor == "wheelspeed"):
+            das.plotGraph(f_data, "mph")        #miles per hour
+    else:
+        if(raw_args.sensor == "accel"):
+            das.plotGraph(df, "Gs", f_data)         #g force
+        elif(raw_args.sensor == 'gyro'):    
+            das.plotGraph(df, "Dps", f_data)        #degrees per second
+        elif(raw_args.sensor == "temp"):    
+            das.plotGraph(df, "Fahrenheit", f_data) #fahrenheit
+        elif(raw_args.sensor == "wheelspeed"):
+            das.plotGraph(df, "mph", f_data)        #miles per hour
 
 
 if __name__ == '__main__':

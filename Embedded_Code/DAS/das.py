@@ -21,6 +21,7 @@ def main():
     func = raw_args.function 
     f_data = df #assignment in the event that the user chose raw data
 
+    #a bunch of if elses to satisfy the function argument
     if(func == 'avg'):
         f_data = das.avg(df)
     elif(func == 'relmax'):     #realtive maximum
@@ -31,6 +32,9 @@ def main():
         f_data = das.absExtremum(df, "max")
     elif(func == 'absmin'):
         f_data = das.absExtremum(df, "min")
+
+    #a bunch of if elses to satisfy the sensor argument
+    #broken up becasue the raw data option doesn't need the optional arguments 
 
     if(raw_args.function == "raw"):             #plots raw graphs without optional arguments
         if(raw_args.sensor == "accel"):

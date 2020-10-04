@@ -21,7 +21,7 @@ def getargs():
         print(len(sys.argv))
         print("Incorrect command line usage, the correct usage is on the line below\n")
         print("python3 das.py --csv <file> --sensor <SENSOR> --function <FUNCTION> --view <VIEW>\n")
-        print("An example would be: python3 das.py --csv file --sensor accel --function raw --view normal")
+        print("An example would be: python3 das.py --csv file --sensor accel --function raw --view standard")
         exit() #quits if the arguments are invalid
     else:
         args = parser.parse_args()
@@ -55,7 +55,7 @@ def relmax(df):
     pct = df.pct_change() #calulating percent change and storing in pct
     for col in df.columns: #iterates over pct to find relative max indecies
         max_data = (df[col]).index[((pct[col]).shift(-1) < 0) & ((pct[col]).shift(1) > 0)].tolist() #finds relative maxima
-        mx = pd.concat([mx, pd.Series(max_data).rename(col)], axis=1, sort=False)
+        mx = pd.concat([mx, pd.Series(max_data).rename(col)], axis=1, sort=False) #appends to current dataframe
     return mx
 
 def relmin(df):
@@ -86,7 +86,7 @@ def plotGraph(df, units, *args): #optional parameter expressed in args
     if(not indecies.empty): #creating different plots based on the provided logic
         for col, ind in zip(df.columns, indecies):
             plt.plot(df[col], label=col) 
-            uplist = indecies[ind].dropna().astype('int32').tolist()
+            uplist = indecies[ind].dropna().astype('int32').tolist() #drops NANs and converts floats to ints to allow for indexing
             plt.plot(uplist, df[col][uplist], marker='o', linestyle='None') 
     else:
         for name in df.columns:

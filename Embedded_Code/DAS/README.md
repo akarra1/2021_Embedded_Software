@@ -3,6 +3,12 @@
 ## Description
 The DAS is a script designed to interpret the raw data collected from the SSA. Currently, it is run on the python interpreter using various arguments to change the behavior of the program
 
+### Dependencies
+Libraries: matplotlib.pyplot, numpy, pandas, argparse
+```
+pip3 install pandas numpy matplotlib argparse
+```
+
 ## Usage
 
 ### Command line argument layout:

@@ -3,7 +3,7 @@
  * CAN-BUS SPI communication code
  */
 // header files
-#include "can.hpp"
+#include "can.h"
 
 void CAN::CAN_INIT()
 {

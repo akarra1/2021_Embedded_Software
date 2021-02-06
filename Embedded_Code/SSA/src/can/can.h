@@ -1,7 +1,6 @@
 #ifndef _CAN_
 #define _CAN_
 
-#include "Energia.h"
 #include "SPI.h"
 
 //registers

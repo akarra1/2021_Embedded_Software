@@ -13,5 +13,13 @@ Andrew Kettle, Jada Berenguer, Leslie Uribe, and Micheal Barbosa
 
 ## Getting Started:
 1) Install Visual Studio Code
-2) Install Platformio extension
-3) Build with tick button in the bottom left (see [image](readme_src/build-button.png))
+2) Install Platformio extension (see [image](readme_src/platformio-installation.png))
+   1) click the extension icon on the left
+   2) find platformio ide
+   3) click install
+3) Open the Platformio project (see [image](readme_src/platformio-interface.png))
+   1) click the platformio icon on the left
+   2) click open (under PIO home)
+   3) click open project, and navigate to SSA root directory
+   4) Platformio should install the necessary dependencies for you
+4) Build with tick button in the bottom left (see [image](readme_src/build-button.png))

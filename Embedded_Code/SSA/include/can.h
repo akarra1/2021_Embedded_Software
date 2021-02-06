@@ -1,7 +1,7 @@
 #ifndef _CAN_
 #define _CAN_
 
-#include "SPI.h"
+#include <SPI.h>
 
 //registers
 # define CNF_1 0x2A           // control registers for initial setup
@@ -32,20 +32,24 @@
 # define MCP_TXB2DLC  0x55    // transmit buff 2 Data length reg
 # define MCP_TXB2DATA 0x56    // transmit buff 2 Data Byte
 /***********************************************************************************/
+
+/*
+
+
+NOTE
+
+this code was taken from when tEnergia was still being used. 
+The following declaration for MCP_csPin is deprecated
+
+Can is currently not working on the SSA
+
+
+
+*/
 // pin
-const int MCP_csPin = P1_4; // May need to active this depending on SSA data output
+//const int MCP_csPin = P1_4; // May need to active this depending on SSA data output
 
-class CAN 
-{
-    public:
-        CAN();
-
-        // Function Declarations
-        void CAN_INIT();
-        void CAN_Message(CAN_FRAME cf, int type, int data);
-        void INIT_SEND(CAN_FRAME cf, int type);
-        enum buffer_type {analog, imu, wheelspeed}; //buffer type for the CAN data
-};
+const int MCP_csPin = -1;   // see comment above
 
 // CAN data frame class
 class CAN_FRAME 
@@ -62,6 +66,19 @@ class CAN_FRAME
          uint16_t  can_id;
          unsigned char can_dlen;
          unsigned char data[CAN_MAX_DLEN];   // this is the can data to be sent
+};
+
+
+class CAN 
+{
+    public:
+        CAN();
+
+        // Function Declarations
+        void CAN_INIT();
+        void CAN_Message(CAN_FRAME cf, int type, int data);
+        void INIT_SEND(CAN_FRAME cf, int type);
+        enum buffer_type {analog, imu, wheelspeed}; //buffer type for the CAN data
 };
 
 #endif

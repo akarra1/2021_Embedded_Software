@@ -28,14 +28,13 @@ void setup() //initializes different sensors
   lsm9ds1.IMU_init(); 
   if(!sdcard.initSD()) { 
     Serial.print("SD initialization failed");  
-  } 
+  } else {
+    sdcard.SdWriteHeader();
+  }
 }
 
 void loop() //Eventually going to want to multithread this so the other threads can make progress while wheel speed delays
 {	
-  //static count used to switch sd card state
-  static int count = 0; 
-
   //get analog data
   temp.analogData(); //reads data
 
@@ -47,15 +46,10 @@ void loop() //Eventually going to want to multithread this so the other threads 
 //	wheelspeedSetup();
 //  while(getwheelspeedData() == 0) { continue; } //waiting for magnet to trigger, magnet has to trigger in order for execution to finish
 //  wheelspeed = getwheelspeedData();
-
-  //Log to SD card
-  if(count == 1) {
-    sdcard.setSDState(true); //change state for the SD card
-  }
+  
   if(!sdcard.SdWrite(lsm9ds1, temp.getTemps(1), temp.getTemps(2), temp.getTemps(3), 0.0)) { 
     Serial.print("Couldn't open file for writing ");  
   }
-  count++; 
   delay(100); //temporary delay for serial line during devlopment
 }
 

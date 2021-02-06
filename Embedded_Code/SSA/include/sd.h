@@ -11,29 +11,27 @@
 
 class SD {
 
+   // static members and methods
    public:
-      SD()
-      {
-         isSdOpen = false; 
-         filenum = '0'; //default value (should be overwritten)
-      } //defualt constructor
+      const static char* file_count_name;
 
-      //Functions
+   public:
+      SD();
+
       bool initSD();
       void SdRemove();
-      int getFname();
+      bool SdWriteHeader();
       bool SdWrite(IMU imu, float t1, float t2, float t3, float ws);
-      char getFileNum() { return filenum; }
-      void setFileNum(int f) { filenum = char(f); }
-      bool getSDState() { return isSdOpen; }
-      void setSDState(bool st) { isSdOpen = st; }
-      void createFileName();
+   
+   private:    // private helper functions
+      void createNewDataFile();
+      int getNumFiles();
+      // this function allows writing of various types
+      template<typename T> bool writeElements(const T* elements, int num_elements);
 
-   private:
-      SdFatSdio SDCARD; //SD card object
-      File file; //file object
-      bool isSdOpen; //state boolean
-      char filenum;
-      char file_name[13]; //small buffer size
+   private:    // private member variables
+      SdFatSdio SDCARD;          //SD card object
+      bool file_has_data;        //state boolean
+      char file_name[13];        //small buffer size
 };
 #endif

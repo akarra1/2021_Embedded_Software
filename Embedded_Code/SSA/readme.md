@@ -23,6 +23,14 @@ Andrew Kettle, Jada Berenguer, Leslie Uribe, and Micheal Barbosa
    2) click open (under PIO home)
    3) click open project, and navigate to SSA root directory
    4) Platformio should install the necessary dependencies for you
-   - ![image](readme_src/platformio-interface.png)
+   - ![platformio interface](readme_src/platformio-interface.png)
 4) Build with tick button in the bottom left 
-   - ![image](readme_src/build-button.png)
+   - ![build button](readme_src/build-button.png)
+5) Upload built hex to the Teensy by pressing the upload button in the bottom left. It looks like a right arrow
+   - ![upload button](readme_src/upload-button.png)
+
+## Helpful Notes:
+- To see the Serial.print output, click the Serial Monitor button at the bottom left
+  - ![serial monitor button](readme_src/serial-monitor.png)
+- If you can't write to the SD card, note that the SD card needs to be formatted as a FAT
+  - look up how to format disks. On MacOS, DiskUtility can be used

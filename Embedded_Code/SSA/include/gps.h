@@ -18,9 +18,9 @@
 #ifndef _GPS_H_
 #define _GPS_H_
 
-#include <time.h>
+#include <TimeLib.h>
 
-#include <Wire.h>
+#include <i2c_t3.h>
 #include <Arduino.h>
 
 #define GPS_SDA 18
@@ -82,7 +82,7 @@ public:
 	float getLongitude();
 
 private:
-	uint32_t lastUpdated; ///< Unix timestamp of when the last fix was taken
+	time_t lastUpdated; ///< Unix timestamp of when the last fix was taken
 	float lat, lon;       ///< Lattitude and longitude returned from the fix, float values
 
 	/**

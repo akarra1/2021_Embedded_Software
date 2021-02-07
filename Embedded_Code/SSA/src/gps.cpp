@@ -18,7 +18,7 @@
 #include "gps.h"
 
 GPS::GPS() {
-	this->lastUpdated = 0;
+	this->lastUpdated = time_t();
 	this->lat = 0.0F;
 	this->lon = 0.0F;
 }
@@ -64,8 +64,6 @@ void GPS::collectData(char* nmeaData) {
 }
 
 int GPS::parseData(char* nmea) {
-	tm t;
-
 	// Check if NMEA sentence has correct prefix
 	char* prefix = strtok(nmea, DELIM);
 	if (strcmp(prefix,RMC_PREFIX))
@@ -96,14 +94,15 @@ int GPS::parseData(char* nmea) {
 	// the magnetic variation and the checksum. 
 	// This data is ignored, as we don't need it.
 
-	t.tm_sec  = tdata % 100;
-	t.tm_min  = (tdata % 10000) / 100;
-	t.tm_hour = tdata / 10000;
-	t.tm_year = (date % 100) + 100; // Assume after 2000
-	t.tm_mon  = (date % 10000) / 100 - 1; // Months 0-11
-	t.tm_mday = date / 10000;
+	tmElements_t time_elements;
+	time_elements.Second = tdata % 100;
+	time_elements.Minute  = (tdata % 10000) / 100;
+	time_elements.Hour = tdata / 10000;
+	time_elements.Year = (date % 100) + 100; // Assume after 2000
+	time_elements.Month  = (date % 10000) / 100 - 1; // Months 0-11
+	time_elements.Day = date / 10000;
 
-	this->lastUpdated = mktime(&t);
+	this->lastUpdated = makeTime(time_elements);
 	this->lat = lat;
 	this->lon = lon;
 

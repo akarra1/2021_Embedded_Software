@@ -57,8 +57,9 @@ void SD::createNewDataFile() {
 }
 
 
-template<typename T>
-bool SD::writeElements(const T* elements, int num_elements) {
+template<typename T, size_t N>
+bool SD::writeElements(const T (&elements)[N])
+{
    //open or append to file depending on state of sd card
    File file;
    if(file_has_data) {
@@ -74,9 +75,9 @@ bool SD::writeElements(const T* elements, int num_elements) {
       file.seek(EOF);
 
       // print the elements to the file as comma-separated values
-      for(int i=0; i<num_elements; ++i) {
+      for(int i=0; i<N; ++i) {
          file.print(elements[i]);
-         if(i < num_elements-1) {
+         if(i < N-1) {
             file.print(", ");
          } else {
             file.print("\n");
@@ -92,23 +93,25 @@ bool SD::writeElements(const T* elements, int num_elements) {
    return true;
 }
 
-bool SD::SdWrite(IMU imu, float t1, float t2, float t3, float ws)
+bool SD::SdWrite(IMU imu, float t1, float t2, float t3, float ws, float lat, float lon)
 {
    float args[] = {
       imu.getAccelX(), imu.getAccelY(), imu.getAccelZ(),
       imu.getGyroX(), imu.getGyroY(), imu.getGyroZ(),
-      t1, t2, t3, ws
+      t1, t2, t3, ws, 
+      lat, lon
    };
-   return writeElements<float>(args, 10);
+   return writeElements<float>(args);
 }
 
 bool SD::SdWriteHeader() {
    String args[] = {
       "Accel-X", "Accel-Y", "Accel-Z",
       "Gyro-X", "Gyro-Y", "Gyro-Z",
-      "Temp-1", "Temp-2", "Temp-3", "Wheelspeed"
+      "Temp-1", "Temp-2", "Temp-3", "Wheelspeed",
+      "Latitude", "Longitude"
    };
-   return writeElements<String>(args, 10);
+   return writeElements<String>(args);
 }
 
 void SD::SdRemove() {

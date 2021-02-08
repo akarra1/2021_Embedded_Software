@@ -9,6 +9,7 @@
 #include "sd.h"
 #include "analog.h"
 #include "wheelspeed.h"
+#include "gps.h"
 #include <Arduino.h>
 
 void printAllData();
@@ -17,20 +18,45 @@ void printAllData();
 IMU lsm9ds1;
 SD sdcard;
 IRsensors temp;
+GPS gpsModule;
 float wheelspeed = 0; 
+
+void waitForSerialSetup() {
+  // this pauses the code until a serial connection has been setup
+  // this is useful if trying to monitor serial prints in the setup phase
+  // as the code normally blows through the setup function before a serial
+  // monitor can be setup
+  while(!Serial);
+  Serial.println("serial monitor successfully setup");
+}
+
+void scanForI2CDevices() {
+    // this piece of code is used for debugging. It checks all possible I2C
+    // addresses, and prints it if a response is found when pinged
+    // this code is taken from 
+    // https://electronics.stackexchange.com/questions/76617/determining-i2c-address-without-datasheet/76622
+    // credit for this function goes to that user
+
+    for (int address=1; address <= 126; address++) {
+        Wire.beginTransmission(address); // Select address
+        if (!Wire.endTransmission()) Serial.printf("Found device at: %02Xh\n", address); 
+    }
+}
 
 void setup() //initializes different sensors
 {
-	Serial.begin(9600); //beginning serial, default is 12 mbit/s for teensys
+    //beginning serial, default is 12 mbit/s for teensys
+	Serial.begin(9600); 
 
-  //setting up sensors
+    //setting up sensors
 	temp.analogSetup();
-  lsm9ds1.IMU_init(); 
-  if(!sdcard.initSD()) { 
-    Serial.print("SD initialization failed");  
-  } else {
-    sdcard.SdWriteHeader();
-  }
+    lsm9ds1.IMU_init(); 
+    gpsModule.initGPS();
+    if(!sdcard.initSD()) { 
+        Serial.print("SD initialization failed");  
+    } else {
+        sdcard.SdWriteHeader();
+    }  
 }
 
 void loop() //Eventually going to want to multithread this so the other threads can make progress while wheel speed delays
@@ -43,11 +69,18 @@ void loop() //Eventually going to want to multithread this so the other threads 
   lsm9ds1.getGyroData(); //Read gyro data
 
   //get wheelspeed data (currently untested)
-//	wheelspeedSetup();
-//  while(getwheelspeedData() == 0) { continue; } //waiting for magnet to trigger, magnet has to trigger in order for execution to finish
-//  wheelspeed = getwheelspeedData();
+  /*
+  wheelspeedSetup();
+  while(getwheelspeedData() == 0) { continue; } //waiting for magnet to trigger, magnet has to trigger in order for execution to finish
+  wheelspeed = getwheelspeedData();
+  */
   
-  if(!sdcard.SdWrite(lsm9ds1, temp.getTemps(1), temp.getTemps(2), temp.getTemps(3), 0.0)) { 
+  // get GPS data
+  gpsModule.updateGPS();
+
+  if(!sdcard.SdWrite(
+      lsm9ds1, temp.getTemps(1), temp.getTemps(2), temp.getTemps(3), 
+      0.0, gpsModule.getLatitude(), gpsModule.getLongitude())) { 
     Serial.print("Couldn't open file for writing ");  
   }
   delay(100); //temporary delay for serial line during devlopment
@@ -74,7 +107,6 @@ void printAllData()
   Serial.println("\n");
 
   //Gyrometer data
-  Serial.print("X axis accel: ");
   Serial.print("X axis gyro: ");
   Serial.println(lsm9ds1.getGyroX());
   Serial.print("Y axis gyro: ");
@@ -87,5 +119,11 @@ void printAllData()
   Serial.print("WheelSpeed: ");
   Serial.println(wheelspeed);
   Serial.println("\n");
-  
+
+  // GPS data
+  Serial.print("lat: ");
+  Serial.println(gpsModule.getLatitude());
+  Serial.print("long: ");
+  Serial.println(gpsModule.getLongitude());
+  Serial.println("\n");
 }

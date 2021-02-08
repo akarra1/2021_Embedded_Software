@@ -20,13 +20,10 @@
 
 #include <TimeLib.h>
 
-#include <i2c_t3.h>
+#include <i2c_t3.h>			// Wire.h for Teensy3.6, as it has 4 sda/scl ports
 #include <Arduino.h>
 
-#define GPS_SDA 18
-#define GPS_SCL 19
-
-#define GPS_ID  0x11
+#define GPS_ID  0x10
 
 #define PACKET_SIZE 256
 #define RMC_PREFIX "$GPRMC"

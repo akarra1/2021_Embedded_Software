@@ -24,9 +24,6 @@ GPS::GPS() {
 }
 
 void GPS::initGPS() {
-	pinMode(GPS_SCL, INPUT_PULLUP);
-	pinMode(GPS_SDA, INPUT_PULLUP);
-
 	Wire.begin();
 
 	Wire.beginTransmission(GPS_ID);

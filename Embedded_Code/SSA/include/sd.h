@@ -21,13 +21,13 @@ class SD {
       bool initSD();
       void SdRemove();
       bool SdWriteHeader();
-      bool SdWrite(IMU imu, float t1, float t2, float t3, float ws);
+      bool SdWrite(IMU imu, float t1, float t2, float t3, float ws, float lat, float lon);
    
    private:    // private helper functions
       void createNewDataFile();
       int getNumFiles();
       // this function allows writing of various types
-      template<typename T> bool writeElements(const T* elements, int num_elements);
+      template<typename T, size_t N> bool writeElements(const T (&elements)[N]);
 
    private:    // private member variables
       SdFatSdio SDCARD;          //SD card object

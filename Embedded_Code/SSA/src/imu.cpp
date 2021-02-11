@@ -126,7 +126,7 @@ float IMU::gyro_conversion(int16_t rawgyro)
 
 void IMU::printAccelData()
 {
- 	  Serial.print("Accel X = ");
+	Serial.print("Accel X = ");
   	Serial.println(accel_x_axis, 2); //prints 3 decimal places
   	Serial.print("Accel Y = ");
   	Serial.println(accel_y_axis, 2); //prints 3 decimal places
@@ -137,7 +137,7 @@ void IMU::printAccelData()
 
 void IMU::printGyroData()
 {
- 	  Serial.print("gyro X = ");
+	Serial.print("gyro X = ");
   	Serial.println(gyro_x_axis, 2); //prints 3 decimal places
   	Serial.print("gyro Y = ");
   	Serial.println(gyro_y_axis, 2); //prints 3 decimal places

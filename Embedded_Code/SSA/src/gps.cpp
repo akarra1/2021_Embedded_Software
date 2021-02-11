@@ -48,7 +48,11 @@ void GPS::collectData(char* nmeaData) {
 		if (!Wire.available()) Wire.requestFrom(GPS_ID, PACKET_SIZE - index);
 	}
 
-	while (index < PACKET_SIZE && nmeaData[index] != '\n') {
+	while (
+			index < PACKET_SIZE && 				// stop if reading more than the buffer
+			(nmeaData[index-1] != '\n' || 		// continue if the last one was not a \n (end of command)
+			(Wire.available() && Wire.peek() == '$'))) 		// continue if there is more in the buffer and it is '$' (start of new command)
+	{
 		if (Wire.available()) {
 			nmeaData[index] = Wire.read();
 			++index;
@@ -56,6 +60,9 @@ void GPS::collectData(char* nmeaData) {
 			Wire.requestFrom(GPS_ID, PACKET_SIZE - index);
 		}
 	}
+	nmeaData[index] = 0;		// add end of phrase character
+	Serial.println(nmeaData);
+
 
 	Wire.endTransmission();
 }

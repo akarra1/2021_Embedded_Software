@@ -25,12 +25,15 @@
 
 #define GPS_ID  0x10
 
-#define PACKET_SIZE 256
+#define PACKET_SIZE 64
 #define RMC_PREFIX "$GPRMC"
 #define DELIM ","
 
 /// The following are predefined NMEA MTK Packets for use with the GPS.
 /// For more info on how these commands are used, look up "PMTK Commands".
+
+// GPS Reset
+#define GPS_FULL_RESTART "$PMTK104*37\r\n"
 
 // Set the GPS position fix interval (1 / 1000ms == 1 Hz). Max 10 Hz
 #define GPS_SET_CTL "$PMTK300,1000,0,0,0,0*1C\r\n"
@@ -38,6 +41,10 @@
 /// Enable NMEA RMC (Recommended Minimum)
 /// This can be changed later if it's decide more data is needed.
 #define GPS_SET_MODE "$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29\r\n"
+
+// This is the response that the GPS module will send over I2C when it
+// is done performing setup and is ready for commands
+#define GPS_STARTUP_RESPONSE "$PMTK011,MTKGPS*08\r\n$PMTK010,001*2E\r\n"
 
 /**
  * Implementation for the GPS module

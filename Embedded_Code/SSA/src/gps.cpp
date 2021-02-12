@@ -27,7 +27,17 @@ void GPS::initGPS() {
 	Wire.begin();
 
 	Wire.beginTransmission(GPS_ID);
+	Wire.write(GPS_FULL_RESTART);
 
+	// wait till the GPS module has responded with startup response code
+	char nmea[PACKET_SIZE];
+	nmea[0] = 0;
+	while(strncmp(nmea, GPS_STARTUP_RESPONSE, BUFSIZ) != 0) {
+		collectData(nmea);
+	}
+
+	// send setup commands after
+	Serial.println("sending setup commands");
 	Wire.write(GPS_SET_MODE);
 	Wire.write(GPS_SET_CTL);
 
@@ -42,12 +52,12 @@ void GPS::collectData(char* nmeaData) {
 	int index = 1;
 	nmeaData[0] = RMC_PREFIX[0];
 
-	Wire.requestFrom(GPS_ID, PACKET_SIZE - index);
+	Wire.requestFrom(GPS_ID, PACKET_SIZE);
 
 	while (Wire.read() != RMC_PREFIX[0]) {
-		if (!Wire.available()) Wire.requestFrom(GPS_ID, PACKET_SIZE - index);
+		if (!Wire.available()) Wire.requestFrom(GPS_ID, PACKET_SIZE);
 	}
-
+	
 	while (
 			index < PACKET_SIZE && 				// stop if reading more than the buffer
 			(nmeaData[index-1] != '\n' || 		// continue if the last one was not a \n (end of command)
@@ -62,7 +72,6 @@ void GPS::collectData(char* nmeaData) {
 	}
 	nmeaData[index] = 0;		// add end of phrase character
 	Serial.println(nmeaData);
-
 
 	Wire.endTransmission();
 }

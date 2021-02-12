@@ -53,6 +53,7 @@ void setup() //initializes different sensors
 {
 	//beginning serial, default is 12 mbit/s for teensys
 	Serial.begin(9600);
+
 	waitForSerialSetup();
 
 	//setting up sensors
@@ -67,7 +68,7 @@ void setup() //initializes different sensors
 	{
 		sdcard.SdWriteHeader();
 	}
-	scanForI2CDevices();
+	Serial.println("hello world");
 }
 
 void loop() //Eventually going to want to multithread this so the other threads can make progress while wheel speed delays
@@ -96,6 +97,10 @@ void loop() //Eventually going to want to multithread this so the other threads 
 		Serial.print("Couldn't open file for writing ");
 	}
 	delay(100); //temporary delay for serial line during devlopment
+
+	Serial.print(gpsModule.getLatitude());
+	Serial.print(",");
+	Serial.println(gpsModule.getLongitude());
 }
 
 void printAllData()

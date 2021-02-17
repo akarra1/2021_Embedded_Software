@@ -21,6 +21,9 @@ IRsensors temp;
 GPS gpsModule;
 float wheelspeed = 0;
 
+// timer to keep track of last update
+uint32_t timer = millis();
+
 void waitForSerialSetup()
 {
 	// this pauses the code until a serial connection has been setup
@@ -68,39 +71,43 @@ void setup() //initializes different sensors
 	{
 		sdcard.SdWriteHeader();
 	}
-	Serial.println("hello world");
 }
 
 void loop() //Eventually going to want to multithread this so the other threads can make progress while wheel speed delays
 {
-	//get analog data
-	temp.analogData(); //reads data
+	if(millis() - timer > 100) {
+		//get analog data
+		temp.analogData(); //reads data
 
-	//get IMU data
-	lsm9ds1.getAccelData(); //Read accel data
-	lsm9ds1.getGyroData();	//Read gyro data
+		//get IMU data
+		lsm9ds1.getAccelData(); //Read accel data
+		lsm9ds1.getGyroData();	//Read gyro data
 
-	//get wheelspeed data (currently untested)
-	/*
-	wheelspeedSetup();
-	while(getwheelspeedData() == 0) { continue; } //waiting for magnet to trigger, magnet has to trigger in order for execution to finish
-	wheelspeed = getwheelspeedData();
-	*/
+		//get wheelspeed data (currently untested)
+		// wheelspeedSetup();
+		// while(getwheelspeedData() == 0) { continue; } //waiting for magnet to trigger, magnet has to trigger in order for execution to finish
+		// wheelspeed = getwheelspeedData();
 
-	// get GPS data
-	gpsModule.updateGPS();
+		// get GPS data
+		Serial.println("here");
+		gpsModule.updateGPS();
+		Serial.println("here");
 
-	if (!sdcard.SdWrite(
+		// write the data
+		if (!sdcard.SdWrite(
 		lsm9ds1, temp.getTemps(1), temp.getTemps(2), temp.getTemps(3),
 		0.0, gpsModule.getLatitude(), gpsModule.getLongitude()))
-	{
-		Serial.print("Couldn't open file for writing ");
-	}
-	delay(100); //temporary delay for serial line during devlopment
+		{
+			Serial.print("Couldn't open file for writing ");
+		}
 
-	Serial.print(gpsModule.getLatitude());
-	Serial.print(",");
-	Serial.println(gpsModule.getLongitude());
+		// reset timer
+		timer = millis();
+
+		Serial.print(gpsModule.getLatitude());
+		Serial.print(",");
+		Serial.println(gpsModule.getLongitude());
+	}
 }
 
 void printAllData()

@@ -28,13 +28,21 @@ void GPS::initGPS() {
 
 	Wire.beginTransmission(GPS_ID);
 	Wire.write(GPS_FULL_RESTART);
+	//Wire.write("$PMTK314,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*28");
+	//Wire.write("$PMTK220,1000*1F");
+	//Wire.write("$PGCMD,33,1*6C");
+
+	/*
+	Wire.write("$PMTK605*31");
+	*/
 
 	// wait till the GPS module has responded with startup response code
+	/*
 	char nmea[PACKET_SIZE];
 	nmea[0] = 0;
 	while(strncmp(nmea, GPS_STARTUP_RESPONSE, BUFSIZ) != 0) {
 		collectData(nmea);
-	}
+	}*/
 
 	// send setup commands after
 	Serial.println("sending setup commands");
@@ -42,38 +50,22 @@ void GPS::initGPS() {
 	Wire.write(GPS_SET_CTL);
 
 	Wire.endTransmission();
+	delay(2000);
 }
 
 // C-style strings because Arduino Strings are the spawn of Satan
 void GPS::collectData(char* nmeaData) {
-
-	Wire.beginTransmission(GPS_ID);
-
-	int index = 1;
-	nmeaData[0] = RMC_PREFIX[0];
-
 	Wire.requestFrom(GPS_ID, PACKET_SIZE);
-
-	while (Wire.read() != RMC_PREFIX[0]) {
-		if (!Wire.available()) Wire.requestFrom(GPS_ID, PACKET_SIZE);
-	}
-	
+	int index = 0;
 	while (
 			index < PACKET_SIZE && 				// stop if reading more than the buffer
 			(nmeaData[index-1] != '\n' || 		// continue if the last one was not a \n (end of command)
 			(Wire.available() && Wire.peek() == '$'))) 		// continue if there is more in the buffer and it is '$' (start of new command)
 	{
-		if (Wire.available()) {
-			nmeaData[index] = Wire.read();
-			++index;
-		} else {
-			Wire.requestFrom(GPS_ID, PACKET_SIZE - index);
-		}
+		nmeaData[index] = Wire.readByte();
+		++index;
 	}
-	nmeaData[index] = 0;		// add end of phrase character
-	Serial.println(nmeaData);
-
-	Wire.endTransmission();
+	nmeaData[index] = 0;
 }
 
 int GPS::parseData(char* nmea) {
@@ -125,6 +117,8 @@ int GPS::parseData(char* nmea) {
 void GPS::updateGPS() {
 	char nmea[PACKET_SIZE];
 	this->collectData(nmea);
+	Serial.print("nmea:");
+	Serial.println(nmea);
 	this->parseData(nmea);
 }
 

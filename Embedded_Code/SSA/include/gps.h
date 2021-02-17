@@ -25,7 +25,7 @@
 
 #define GPS_ID  0x10
 
-#define PACKET_SIZE 64
+#define PACKET_SIZE 32
 #define RMC_PREFIX "$GPRMC"
 #define DELIM ","
 
@@ -33,7 +33,7 @@
 /// For more info on how these commands are used, look up "PMTK Commands".
 
 // GPS Reset
-#define GPS_FULL_RESTART "$PMTK104*37\r\n"
+#define GPS_FULL_RESTART "$PMTK104*37"
 
 // Set the GPS position fix interval (1 / 1000ms == 1 Hz). Max 10 Hz
 #define GPS_SET_CTL "$PMTK300,1000,0,0,0,0*1C\r\n"

@@ -25,8 +25,8 @@
 
 #define GPS_ID  0x10
 
-#define PACKET_SIZE 32
-#define RMC_PREFIX "$GPRMC"
+#define PACKET_SIZE 256
+#define RMC_PREFIX "$GNGGA"
 #define DELIM ","
 
 /// The following are predefined NMEA MTK Packets for use with the GPS.

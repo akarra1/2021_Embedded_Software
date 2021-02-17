@@ -57,8 +57,6 @@ void setup() //initializes different sensors
 	//beginning serial, default is 12 mbit/s for teensys
 	Serial.begin(9600);
 
-	waitForSerialSetup();
-
 	//setting up sensors
 	temp.analogSetup();
 	lsm9ds1.IMU_init();
@@ -89,9 +87,7 @@ void loop() //Eventually going to want to multithread this so the other threads 
 		// wheelspeed = getwheelspeedData();
 
 		// get GPS data
-		Serial.println("here");
 		gpsModule.updateGPS();
-		Serial.println("here");
 
 		// write the data
 		if (!sdcard.SdWrite(
@@ -103,10 +99,6 @@ void loop() //Eventually going to want to multithread this so the other threads 
 
 		// reset timer
 		timer = millis();
-
-		Serial.print(gpsModule.getLatitude());
-		Serial.print(",");
-		Serial.println(gpsModule.getLongitude());
 	}
 }
 

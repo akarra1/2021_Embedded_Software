@@ -74,12 +74,9 @@ int GPS::parseData(char* nmea) {
 	if (strcmp(prefix,RMC_PREFIX))
 		return 1; // WRONG PREFIX
 
-	// Get time ( HHMMSS )
-	int tdata = atoi(strtok(NULL, DELIM));
+	// Parse NMEA fields
 
-	// Check if NMEA data is Acceptable or Void
-	if (strtok(NULL, DELIM)[0] != 'A')
-		return 2; // DATA VOID
+	strtok(NULL, DELIM);	// time (HHMMSS), ignored
 
 	// Latitude ( ####.## )
 	float lat = atof(strtok(NULL, DELIM)) *
@@ -89,25 +86,14 @@ int GPS::parseData(char* nmea) {
 	float lon = atof(strtok(NULL, DELIM)) *
 		(strtok(NULL, DELIM)[0] == 'E' ? 1.0F : -1.0F);
 
-	strtok(NULL, DELIM); // Ground speed, ignored
-	strtok(NULL, DELIM); // Track angle, ignored
-
-	// Date ( ddmmyy )
-	int date = atoi(strtok(NULL, DELIM));
+	strtok(NULL, DELIM); 	// Ground speed, ignored
+	strtok(NULL, DELIM); 	// Track angle, ignored
+	strtok(NULL, DELIM);	// Date (ddmmyyyy), ignored
 
 	// There is technically more data left in the NMEA setence: 
 	// the magnetic variation and the checksum. 
 	// This data is ignored, as we don't need it.
 
-	tmElements_t time_elements;
-	time_elements.Second = tdata % 100;
-	time_elements.Minute  = (tdata % 10000) / 100;
-	time_elements.Hour = tdata / 10000;
-	time_elements.Year = (date % 100) + 100; // Assume after 2000
-	time_elements.Month  = (date % 10000) / 100 - 1; // Months 0-11
-	time_elements.Day = date / 10000;
-
-	this->lastUpdated = makeTime(time_elements);
 	this->lat = lat;
 	this->lon = lon;
 
@@ -117,13 +103,7 @@ int GPS::parseData(char* nmea) {
 void GPS::updateGPS() {
 	char nmea[PACKET_SIZE];
 	this->collectData(nmea);
-	Serial.print("nmea:");
-	Serial.println(nmea);
 	this->parseData(nmea);
-}
-
-uint32_t GPS::getLastUpdate() {
-	return this->lastUpdated;
 }
 
 float GPS::getLatitude() {

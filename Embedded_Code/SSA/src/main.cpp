@@ -19,7 +19,7 @@ IMU lsm9ds1;
 SD sdcard;
 IRsensors temp;
 GPS gpsModule;
-float wheelspeed = 0;
+WheelSpeed wheelspeed;
 
 // timer to keep track of last update
 uint32_t timer = millis();
@@ -73,6 +73,11 @@ void setup() //initializes different sensors
 
 void loop() //Eventually going to want to multithread this so the other threads can make progress while wheel speed delays
 {
+	// this happens every loop iteration as we do not want to miss a magnet event
+	wheelspeed.checkWheelspeedSensor();
+
+
+	// this if statement happens only every 100ms (as opposed to every loop iteration)
 	if(millis() - timer > 100) {
 		//get analog data
 		temp.analogData(); //reads data
@@ -81,18 +86,14 @@ void loop() //Eventually going to want to multithread this so the other threads 
 		lsm9ds1.getAccelData(); //Read accel data
 		lsm9ds1.getGyroData();	//Read gyro data
 
-		//get wheelspeed data (currently untested)
-		// wheelspeedSetup();
-		// while(getwheelspeedData() == 0) { continue; } //waiting for magnet to trigger, magnet has to trigger in order for execution to finish
-		// wheelspeed = getwheelspeedData();
-
 		// get GPS data
 		gpsModule.updateGPS();
 
 		// write the data
 		if (!sdcard.SdWrite(
-		lsm9ds1, temp.getTemps(1), temp.getTemps(2), temp.getTemps(3),
-		0.0, gpsModule.getLatitude(), gpsModule.getLongitude()))
+			lsm9ds1, temp.getTemps(1), temp.getTemps(2), temp.getTemps(3),
+			wheelspeed.getWheelspeedMph(),
+			gpsModule.getLatitude(), gpsModule.getLongitude()))
 		{
 			Serial.print("Couldn't open file for writing ");
 		}
@@ -133,7 +134,7 @@ void printAllData()
 
 	//Wheelspeed data
 	Serial.print("WheelSpeed: ");
-	Serial.println(wheelspeed);
+	Serial.println(wheelspeed.getWheelspeedMph());
 	Serial.println("\n");
 
 	// GPS data

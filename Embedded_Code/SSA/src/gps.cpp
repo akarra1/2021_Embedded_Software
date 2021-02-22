@@ -28,24 +28,6 @@ void GPS::initGPS() {
 
 	Wire.beginTransmission(GPS_ID);
 	Wire.write(GPS_FULL_RESTART);
-	//Wire.write("$PMTK314,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*28");
-	//Wire.write("$PMTK220,1000*1F");
-	//Wire.write("$PGCMD,33,1*6C");
-
-	/*
-	Wire.write("$PMTK605*31");
-	*/
-
-	// wait till the GPS module has responded with startup response code
-	/*
-	char nmea[PACKET_SIZE];
-	nmea[0] = 0;
-	while(strncmp(nmea, GPS_STARTUP_RESPONSE, BUFSIZ) != 0) {
-		collectData(nmea);
-	}*/
-
-	// send setup commands after
-	Serial.println("sending setup commands");
 	Wire.write(GPS_SET_MODE);
 	Wire.write(GPS_SET_CTL);
 

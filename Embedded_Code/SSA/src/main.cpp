@@ -10,6 +10,7 @@
 #include "analog.h"
 #include "wheelspeed.h"
 #include "gps.h"
+#include "can.h"
 #include <Arduino.h>
 
 void printAllData();
@@ -20,6 +21,7 @@ SD sdcard;
 IRsensors temp;
 GPS gpsModule;
 WheelSpeed wheelspeed;
+CanInterface canInterface;
 
 // timer to keep track of last update
 uint32_t timer = millis();
@@ -97,6 +99,13 @@ void loop() //Eventually going to want to multithread this so the other threads 
 		{
 			Serial.print("Couldn't open file for writing ");
 		}
+
+		// send data over CAN
+		canInterface.sendAllData(
+			lsm9ds1, temp.getTemps(1), temp.getTemps(2), temp.getTemps(3),
+			wheelspeed.getWheelspeedMph(),
+			gpsModule.getLatitude(), gpsModule.getLongitude()
+		);
 
 		// reset timer
 		timer = millis();

@@ -93,7 +93,7 @@ bool SD::writeElements(const T (&elements)[N])
    return true;
 }
 
-bool SD::SdWrite(IMU imu, float t1, float t2, float t3, float ws, float lat, float lon)
+bool SD::SdWrite(const IMU& imu, float t1, float t2, float t3, float ws, float lat, float lon)
 {
    float args[] = {
       imu.getAccelX(), imu.getAccelY(), imu.getAccelZ(),

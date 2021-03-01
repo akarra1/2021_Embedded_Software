@@ -21,7 +21,7 @@ class SD {
       bool initSD();
       void SdRemove();
       bool SdWriteHeader();
-      bool SdWrite(IMU imu, float t1, float t2, float t3, float ws, float lat, float lon);
+      bool SdWrite(const IMU& imu, float t1, float t2, float t3, float ws, float lat, float lon);
    
    private:    // private helper functions
       void createNewDataFile();

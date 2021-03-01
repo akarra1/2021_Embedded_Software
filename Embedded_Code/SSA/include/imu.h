@@ -62,12 +62,12 @@ class IMU {
       void printGyroData();
 
       //getters for specific values
-      float getAccelX() { return accel_x_axis; }
-      float getAccelY() { return accel_y_axis; }
-      float getAccelZ() { return accel_z_axis; }
-      float getGyroX()  { return gyro_x_axis; }
-      float getGyroY()  { return gyro_y_axis; }
-      float getGyroZ()  { return gyro_z_axis; }
+      float getAccelX() const { return accel_x_axis; }
+      float getAccelY() const { return accel_y_axis; }
+      float getAccelZ() const { return accel_z_axis; }
+      float getGyroX()  const { return gyro_x_axis; }
+      float getGyroY()  const { return gyro_y_axis; }
+      float getGyroZ()  const { return gyro_z_axis; }
 
    private:
       float accel_x_axis;

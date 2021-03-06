@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>DAS</title>
+{% endblock %}
+
+{% block body %}
+
+<div class="row">
+
+    <div class="column">
+        {% include 'plot.html' %}
+        <text style="text-align:center">Note: Each sample is taken approximately every 100ms <br /> </text>
+    </div>
+
+    <div class="column">
+        <br />
+        <br />
+        <br />
+        <text>Averages</text>
+        {% for avg in averages %}
+        <li>
+            <text>{{avg[0]}}: {{ (avg[1])|round(3) }}</text>
+        </li>
+        {% endfor %}
+        <br />
+        <text>Absolute Minimums</text>
+        {% for min in absmins %}
+        <li>
+            <text>{{min[0]}}: {{ (min[1])|round(3) }}</text>
+        </li>
+        {% endfor %}
+        <br />
+        <text>Absolute Maximums</text>
+        {% for max in absmaxes %}
+        <li>
+            <text>{{max[0]}}: {{ (max[1])|round(3) }}</text>
+        </li>
+        {% endfor %}
+    </div>
+
+</div>
+
+
+
+
+{% endblock %}

@@ -2,11 +2,17 @@
 # Written by Andrew Kettle
 # Last Revision: Sept 4th, 2020
 
+import matplotlib
+matplotlib.use('Agg') #prevents error "main thread is not in main loop"
+
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 import numpy as np
 import pandas as pd
 import sys 
 import argparse
+import mpld3 #allows for creation of interactive plot for web app
+
 
 ####### INPUT & FILTERING FUNCTIONS ########
 
@@ -54,7 +60,7 @@ def relmax(df):
     mx = pd.DataFrame() #empty dataframe
     pct = df.pct_change() #calulating percent change and storing in pct
     for col in df.columns: #iterates over pct to find relative max indecies
-        max_data = (df[col]).index[((pct[col]).shift(-1) < 0) & ((pct[col]).shift(1) > 0)].tolist() #finds relative maxima
+        max_data = (df[col]).index[((pct[col]) > 0) & ((pct[col]).shift(-1) < 0)].tolist() #finds relative maxima
         mx = pd.concat([mx, pd.Series(max_data).rename(col)], axis=1, sort=False) #appends to current dataframe
     return mx
 
@@ -62,10 +68,10 @@ def relmin(df):
     mn = pd.DataFrame() #empty dataframe
     pct = df.pct_change() #calulating percent change and storing in pct
     for col in df.columns: #iterates over pct to find relative max indecies
-        max_data = (df[col]).index[((pct[col]).shift(-1) > 0) & ((pct[col]).shift(1) < 0)].tolist() #finds relative maxima
+        max_data = (df[col]).index[((pct[col]) < 0) & ((pct[col]).shift(-1) > 0)].tolist() #finds relative minima
         mn = pd.concat([mn, pd.Series(max_data).rename(col)], axis=1, sort=False)
     return mn
-
+    
 def absExtremum(data, extype):
     if(extype=="min"):
         return data.min()
@@ -77,25 +83,92 @@ def absExtremum(data, extype):
 ####### END DATA ANALYSIS #######
 
 ####### BEGIN VISUALIZATION FUCNTIONS #######
+
 def plotGraph(df, units, *args): #optional parameter expressed in args
+    
+    # Define some CSS to control our custom labels
+    css = """
+    text span
+    {
+    color: black;
+    background-color: white; 
+    }
+    
+    """
+    fig, ax = plt.subplots()
 
     indecies = []           #default value
     if(args):               #an optional argument exists
         indecies = args[0]  #index for relmax, relmin, max, min
 
-    if(not indecies.empty): #creating different plots based on the provided logic
+    
+    
+    if(not (type(indecies) == list)): #creating different plots based on the provided logic
+        
         for col, ind in zip(df.columns, indecies):
+            labels = []
+            htmllabels = []
+
             plt.plot(df[col], label=col) 
             uplist = indecies[ind].dropna().astype('int32').tolist() #drops NANs and converts floats to ints to allow for indexing
-            plt.plot(uplist, df[col][uplist], marker='o', linestyle='None') 
+            dots, = plt.plot(uplist, round(df[col][uplist], 3), marker='o', linestyle='None')
+
+            labels = round(df[col][uplist], 3).T #create Series object of data
+
+            labels = list(labels.to_frame().to_records()) #convert Series object into list of tuples
+            
+            #build list of HTML labels given list of tuples
+            for val in labels:
+                htmllabels.append("<text><span>{val}</span></text>".format(val=val))
+
+            #create tooltip: text which hovers over points.
+            tooltip = mpld3.plugins.PointHTMLTooltip(dots, htmllabels, hoffset = 10, css = css)
+            mpld3.plugins.connect(fig, tooltip)
+
     else:
         for name in df.columns:
             plt.plot(df[name], label=name)
 
+    
     plt.title("Time vs Output Graph")
     plt.xlabel("Samples")		
     plt.ylabel(units)
     plt.legend(loc="best")
-    plt.show()
+
+    # Previously used for static image but replaced by dynamic graph
+    # fig.savefig('./static/images/plot.png') # Embed the result in the html output.
+
+    # convert matplot figure into dynamic html code using mpld3
+    html_str = mpld3.fig_to_html(fig, figid="graph")
+    html_file = open('./templates/plot.html', 'w')
+    html_file.write(html_str)
+    html_file.close()
+
+    #plt.show() #no longer needed because of web application
+
+    return fig
+    
+
+def get_avg(df):
+    averages = []
+    f_data = avg(df)
+    for col, ind in zip(df.columns, f_data):
+        averages.append((col,ind))
+    return averages
+
+
+def get_absmin(df):
+    absmins = []
+    f_data = absExtremum(df, "min")
+    for col, ind in zip(df.columns, f_data):
+        absmins.append((col,ind))
+    return absmins
+
+def get_absmax(df):
+    absmaxes = []
+    f_data = absExtremum(df, "max")
+    for col, ind in zip(df.columns, f_data):
+        absmaxes.append((col,ind))
+    return absmaxes
 
 ####### END VISUALIZATION FUCNTIONS #######

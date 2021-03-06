@@ -1,0 +1,29 @@
+html {
+    background-color: #D0E4F5;
+    background-image: url("../images/EV-blank_background_silhouette.png");
+    background-size: 150px;
+    background-repeat: no-repeat;
+    background-attachment: scroll;
+    background-position: 0% 100%;
+}
+
+body {
+    font-family: sans-serif;
+    text-align: center;
+
+    
+}
+
+
+.column {
+    float: left;
+    width: 50%;
+  }
+  
+/* Clear floats after the columns */
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+  

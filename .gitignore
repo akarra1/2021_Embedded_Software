@@ -1,2 +1,3 @@
-
 *.pyc
+Embedded_Code/DAS/__pycache__/
+Embedded_Code/DAS/uploads/*

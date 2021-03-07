@@ -16,6 +16,7 @@ ALLOWED_EXTENSIONS = {'csv'}
 
 app = Flask(__name__)
 app.secret_key = "racecar"
+app.config["CSV_UPLOADS"] = UPLOAD_FOLDER
 
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
 # db = SQLAlchemy(app)
@@ -54,6 +55,7 @@ def index():
             return redirect(request.url)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config["CSV_UPLOADS"], file.filename))
             sensor = request.form["sensor"]
             func = request.form["function"]
             (averages, absmins, absmaxes) = handle_data(filename, sensor, func)
@@ -65,7 +67,7 @@ def index():
                                     function=func))'''
 
     if show_data:
-        return render_template('index.html', sensor=sensor, function=func,
+        return render_template('index.html', filename = filename, sensor=sensor, function=func,
         averages = averages, absmins = absmins, absmaxes = absmaxes, data= True)
     else:
         return render_template('index.html')
@@ -76,7 +78,7 @@ def handle_data(filename,sensor,function):
     headernames = ["Accel_X", "Accel_Y", "Accel_Z", "Gyro_X", "Gyro_Y", "Gyro_Z", "IR_1", "IR_2", "IR_3", "Wheelspeed"]
 
     #read csv file, append headers
-    df = das.getdf(filename, headernames) #gets dataframe from csv file
+    df = das.getdf("./uploads/" + filename, headernames) #gets dataframe from csv file
     #filter for desired sensor
     df = das.filterSensor(df, sensor)
 

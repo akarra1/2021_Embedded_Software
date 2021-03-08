@@ -5,6 +5,8 @@
 
 
 import os
+import pathlib
+import datetime
 from flask import Flask, render_template, url_for, request, redirect, flash
 from werkzeug.utils import secure_filename
 import io
@@ -29,8 +31,19 @@ def index():
 def render_file_list():
 	return render_template('file_list.html', file_list=get_file_list())
 
-def get_file_list() -> [str]:
-	return [f for f in os.listdir("./uploads") if os.path.isfile(os.path.join("./uploads", f))]
+def get_file_list() -> [(str, str)]:
+	# Returns a list of tuples. Each tuple represents one file
+	# The tuple contains filename, date modified, 
+	files = [f for f in os.listdir(UPLOAD_FOLDER) if os.path.isfile(os.path.join(UPLOAD_FOLDER, f))]
+	return [get_file_tuple(f) for f in files]
+
+def get_file_tuple(filename: str) -> (str, str):
+	filepath: pathlib.Path = pathlib.Path(os.path.join(UPLOAD_FOLDER, filename))
+	modified_time = datetime.datetime.fromtimestamp(filepath.stat().st_ctime)		
+	#	st_ctime is Platform dependent: 	see https://docs.python.org/3/library/os.html#os.stat_result
+	#		the time of most recent metadata change on Unix,
+	#		the time of creation on Windows, expressed in seconds.
+	return (filename, modified_time)
 
 @app.route('/file-upload', methods=['POST'])
 def upload_file():

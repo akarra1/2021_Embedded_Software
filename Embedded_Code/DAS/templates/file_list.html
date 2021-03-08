@@ -6,8 +6,19 @@
 
 {% block body %}
 
-{% for file_name in file_list %}
-<a href={{url_for('view_uploaded_files', filename=file_name, sensor="accel", function="raw")}}>{{file_name}}</a>
-{% endfor %}
+<table class="center">
+	<tr>
+		<th><text>File name</text></th>
+		<th><text>uploaded/modified</text></th>
+	</tr>
+
+	{% for file_name, file_date in file_list %}
+	<tr>
+		<td><a href={{url_for('view_uploaded_files', filename=file_name, sensor="accel", function="raw")}}>{{file_name}}</a></td>
+		<td><text>{{file_date}}</text></td>
+	</tr>
+	{% endfor %}
+</table>
+
 
 {% endblock %}

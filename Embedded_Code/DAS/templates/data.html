@@ -6,6 +6,8 @@
 
 {% block body %}
 
+<meta id="filename-meta-data" filename="{{filename}}"><meta/>
+
 <div class="row">
 
     <div class="column">
@@ -15,9 +17,24 @@
 
     <div class="column">
         <text>Plotting: {{filename}} <br /></text>
-        <text>Sensor: {{sensor}} <br /></text>
-        <text>Function: {{function}} <br /></text>
-        <br />
+
+        <text>Sensor: </text>
+		<select name="sensor" id="sensor-select" onchange="on_select_change()">
+			<option value="accel" {% if sensor=="accel" %} selected="selected"{% endif %}>Acceleration</option>
+			<option value="gyro" {% if sensor=="gyro" %} selected="selected"{% endif %}>Gyro</option>
+			<option value="temp" {% if sensor=="temp" %} selected="selected"{% endif %}>Temperature</option>
+			<option value="wheelspeed" {% if sensor=="wheelspeed" %} selected="selected"{% endif %}>Wheelspeed</option>
+		</select>
+		<br/>
+
+        <text>Function: </text>
+		<select name="function" id="function-select" onchange="on_select_change()">
+			<option value="raw" {% if function=="raw" %} selected="selected"{% endif %}>Raw</option>
+			<option value="relmin" {% if function=="relmin" %} selected="selected"{% endif %}>Relative Minimum</option>
+			<option value="relmax" {% if function=="relmax" %} selected="selected"{% endif %}>Relative Maximum</option>
+		</select>
+		<br/>
+
         <text>Averages</text>
         {% for avg in averages %}
         <li>
@@ -43,6 +60,6 @@
 </div>
 
 
-
+<script type="text/javascript" src="{{url_for('static', filename='javascript/data.js')}}"></script>
 
 {% endblock %}

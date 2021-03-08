@@ -1,7 +1,5 @@
 html {
     background-color: #D0E4F5;
-    background-image: url("../images/EV-blank_background_silhouette.png");
-    background-size: 150px;
     background-repeat: no-repeat;
     background-attachment: scroll;
     background-position: 0% 100%;
@@ -10,6 +8,39 @@ html {
 body {
     font-family: sans-serif;
     text-align: center;   
+}
+
+.topnav {
+	background-color: #a6d4fd;
+	overflow: hidden;
+}
+
+.topnav img {
+	width: 150px;
+	height: auto;
+	float: right;
+}
+
+.topnav span {
+	float: left;
+	background-color: #a6d4fd;
+	text-align: center;
+	padding: 14px 16px;
+	font-size: 20px;
+	font-weight: bold;
+}
+
+.topnav a {
+	float: left;
+	background-color: #a6d4fd;
+	text-align: center;
+	padding: 14px 16px;
+	font-size: 17px;
+}
+
+.topnav a:hover {
+	background-color: #8ac8ff;
+	color: black;
 }
 
 .column {

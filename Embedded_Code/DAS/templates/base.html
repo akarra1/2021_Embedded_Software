@@ -8,6 +8,13 @@
     {% block head %}{% endblock %}
 </head>
 <body>
+	<div class="topnav">
+		<span>DAS WebApp</span>
+		<a href="{{ url_for('index')}}">Home</a>
+		<a href="{{ url_for('render_file_list')}}">File List</a>
+		<img src="../static/images/EV-blank_background_silhouette.png">
+	</div>
+
 	<div class="container">
     	{% block body %}{% endblock %}
 	</div>

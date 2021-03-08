@@ -28,7 +28,7 @@ def index():
 def render_file_list():
 	return render_template('index.html')
 
-@app.route('/file/upload', methods=['POST'])
+@app.route('/file-upload', methods=['POST'])
 def upload_file():
 	# check if the post request has the file part
 	if 'file' not in request.files:
@@ -50,7 +50,7 @@ def upload_file():
 	return redirect(url_for('view_uploaded_files', filename=filename, sensor=sensor, function=func))
 
 
-@app.route('/file/error', methods=['GET'])
+@app.route('/file-error', methods=['GET'])
 def file_error():
 	return render_template('file_error.html')
 
@@ -60,7 +60,7 @@ def view_uploaded_files(filename: str, sensor: str, function: str):
 	try:
 		(averages, absmins, absmaxes) = handle_data(filename, sensor, function)
 	except Exception:
-		return redirect('/file/error')
+		return redirect('/file-error')
 
 	return render_template('data.html', filename=filename, sensor=sensor, function=function,
 		average=averages, absmins=absmins, absmaxes=absmaxes, data=True)

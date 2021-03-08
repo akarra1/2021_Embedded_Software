@@ -9,13 +9,11 @@
 {% with messages = get_flashed_messages() %}
   {% if messages %}
     {% for msg in messages %}
-      <text>ERROR: {{msg}}</text>
+      <text>ERROR: {{msg}}</text> <br/>
     {% endfor %}
   {% endif %}
 {% endwith %}
-
-<br/>
-<br/>
+<br/><br/>
 <text>
   Welcome to the Data Analysis Script Web Application! 
   To start, make sure you have the appropiate csv file and upload it.
@@ -25,10 +23,14 @@
   Then select which sensor you want to see, and select a corresponding function.
   Lastly, click submit!
 </text>
-<br /><br />
+<br/>
+<br/>
+<br/>
 <form action="/file-upload" method=post enctype=multipart/form-data>
     <label for="file">Upload CSV File:</label>
     <input type=file name=file>
+	<br/>
+	<br/>
 
     <label for="sensor">Select a Sensor:</label>
     <select name="sensor" id="sensor">

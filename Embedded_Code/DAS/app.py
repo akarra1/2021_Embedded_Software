@@ -1,6 +1,7 @@
 # DAS Web App
 # Written by Michael Felizardo
-# Last Revision: 3/1/2021 
+# Maintained by Michael Felizardo and William Sun
+# Last Revision: 3/7/2021 
 
 
 import os
@@ -26,20 +27,23 @@ def index():
 
 @app.route('/file-list', methods=['GET'])
 def render_file_list():
-	return render_template('index.html')
+	return render_template('file_list.html', file_list=get_file_list())
+
+def get_file_list() -> [str]:
+	return [f for f in os.listdir("./uploads") if os.path.isfile(os.path.join("./uploads", f))]
 
 @app.route('/file-upload', methods=['POST'])
 def upload_file():
 	# check if the post request has the file part
 	if 'file' not in request.files:
 		flash('No file part')
-		return redirect(request.url)
+		return redirect(url_for('index'))
 	file = request.files['file']
 
 	# handle not uploading file 
 	if file.filename == '':
 		flash('No selected file')
-		return redirect(request.url)
+		return redirect(url_for('index'))
 
 	# get values from uploaded fields
 	filename = secure_filename(file.filename)
@@ -63,7 +67,7 @@ def view_uploaded_files(filename: str, sensor: str, function: str):
 		return redirect('/file-error')
 
 	return render_template('data.html', filename=filename, sensor=sensor, function=function,
-		average=averages, absmins=absmins, absmaxes=absmaxes, data=True)
+		averages=averages, absmins=absmins, absmaxes=absmaxes, data=True)
 
 
 def handle_data(filename,sensor,function):

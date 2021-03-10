@@ -7,7 +7,7 @@
 import os
 import pathlib
 import datetime
-from flask import Flask, render_template, url_for, request, redirect, flash
+from flask import Flask, render_template, url_for, request, redirect, flash, send_from_directory
 from werkzeug.utils import secure_filename
 import io
 
@@ -22,28 +22,58 @@ app.config["CSV_UPLOADS"] = UPLOAD_FOLDER
 
 
 
+"""
+	App routes for the home page
+"""
 
 @app.route('/', methods=['GET'])
 def index():
 	return render_template('index.html')
 
+
+
+"""
+	App routes that deal with file list page
+"""
+
 @app.route('/file-list', methods=['GET'])
 def render_file_list():
-	return render_template('file_list.html', file_list=get_file_list())
+	return render_template('file_list.html', file_list=get_sorted_file_list())
 
-def get_file_list() -> [(str, str)]:
+def get_sorted_file_list() -> [(str, datetime.date, str)]:
+	# sort the file list by date
+	return sorted(get_file_list(), key=lambda x: x[1], reverse=True)
+
+def get_file_list() -> [(str, datetime.date, str)]:
 	# Returns a list of tuples. Each tuple represents one file
 	# The tuple contains filename, date modified, 
 	files = [f for f in os.listdir(UPLOAD_FOLDER) if os.path.isfile(os.path.join(UPLOAD_FOLDER, f))]
 	return [get_file_tuple(f) for f in files]
 
-def get_file_tuple(filename: str) -> (str, str):
+def get_file_tuple(filename: str) -> (str, datetime.date, str):
 	filepath: pathlib.Path = pathlib.Path(os.path.join(UPLOAD_FOLDER, filename))
-	modified_time = datetime.datetime.fromtimestamp(filepath.stat().st_ctime)		
+	modified_time = datetime.datetime.fromtimestamp(filepath.stat().st_ctime)	
+	time_str: str = modified_time.strftime("%b %d %Y %H:%M:%S")	
 	#	st_ctime is Platform dependent: 	see https://docs.python.org/3/library/os.html#os.stat_result
 	#		the time of most recent metadata change on Unix,
 	#		the time of creation on Windows, expressed in seconds.
-	return (filename, modified_time)
+	return (filename, modified_time, time_str)
+
+
+
+"""
+	App routes that deal with file error page
+"""
+
+@app.route('/file-error', methods=['GET'])
+def file_error():
+	return render_template('file_error.html')
+
+
+
+"""
+	Endpoint for uploading files
+"""
 
 @app.route('/file-upload', methods=['POST'])
 def upload_file():
@@ -67,13 +97,23 @@ def upload_file():
 	return redirect(url_for('view_uploaded_files', filename=filename, sensor=sensor, function=func))
 
 
-@app.route('/file-error', methods=['GET'])
-def file_error():
-	return render_template('file_error.html')
 
+"""
+	App routes for viewing graphs of data files
+"""
+
+@app.route('/file/<filename>/', methods=['GET'])
+def download_uploaded_file(filename: str):
+	# This function serves the file itself. This is needed for position-graph
+	# as the js code will request this endpoint and render the data in the file
+	return send_from_directory('uploads', filename)
+
+@app.route('/file/<filename>/position-graph', methods=['GET'])
+def view_graph_against_position(filename: str):
+	return render_template('position_graph.html', filename=filename)
 
 @app.route('/file/<filename>/<sensor>/<function>', methods=['GET'])
-def view_uploaded_files(filename: str, sensor: str, function: str):
+def view_graph_against_time(filename: str, sensor: str, function: str):
 	try:
 		(averages, absmins, absmaxes) = handle_data(filename, sensor, function)
 	except Exception:

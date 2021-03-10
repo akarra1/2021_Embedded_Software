@@ -10,12 +10,14 @@
 	<tr>
 		<th><text>File name</text></th>
 		<th><text>uploaded/modified</text></th>
+		<th><text>graphs against time</text></th>
 	</tr>
 
-	{% for file_name, file_date in file_list %}
+	{% for name, date, date_str in file_list %}
 	<tr>
-		<td><a href={{url_for('view_uploaded_files', filename=file_name, sensor="accel", function="raw")}}>{{file_name}}</a></td>
-		<td><text>{{file_date}}</text></td>
+		<td><a href={{url_for('download_uploaded_file', filename=name)}}>{{name}}</a></td>
+		<td><text>{{date_str}}</text></td>
+		<td><a href={{url_for('view_graph_against_time', filename=name, sensor="accel", function="raw")}}>graph</a></td>
 	</tr>
 	{% endfor %}
 </table>

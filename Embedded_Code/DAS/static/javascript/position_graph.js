@@ -25,7 +25,6 @@ function parse_file(file_text) {
 	data = turn_rows_into_objects(data);	// parse the rows
 	data = truncate_zero_rows(data);		// remove rows where there is not lat/lon data (lat and lon = 0)
 	data = interpolate_data(data);			// fill in gaps between position of data
-	console.log(data);
 	plot_data(data);
 }
 
@@ -129,38 +128,50 @@ function convert_data_to_plot_data(data) {
 }
 
 function plot_data(data) {
-	var chart = new CanvasJS.Chart("chartContainer", {
-		animationEnabled: false,
-		zoomEnabled: true,
-		title:{
-			text: "Data against position"
-		},
-		axisX: {
-			title: "Longitude",
-			valueFormatString: "### °"
-		},
-		axisY:{
-			title: "Latitude",
-			valueFormatString: "### °"
-		},
-		data: [{
-			type: "scatter",
-			toolTipContent:"<b>Accel-X: </b>{d[0]} <br/> \
-							<b>Accel-Y: </b>{d[1]} <br/> \
-							<b>Accel-Z: </b>{d[2]} <br/> \
-							<b>Gyro-X: </b>{d[3]} °<br/> \
-							<b>Gyro-Y: </b>{d[4]} °<br/> \
-							<b>Gyro-Z: </b>{d[5]} °<br/> \
-							<b>Temp-1: </b>{d[6]} °f<br/> \
-							<b>Temp-2: </b>{d[7]} °f<br/> \
-							<b>Temp-3: </b>{d[8]} °f<br/> \
-							<b>Wheelspeed-X: </b>{d[9]} mph<br/> \
-							<b>Long: </b>{x}<br/> \
-							<b>Lat: </b>{y} °",
-			dataPoints: convert_data_to_plot_data(data)
-		}]
-	});
-	chart.render();
+	var lat_list = data.map(obj => obj.lat);
+	var avg_lat = lat_list.reduce((a,b)=>(a+b)) / lat_list.length;
+
+	var lon_list = data.map(obj => obj.lon);
+	var avg_lon = lon_list.reduce((a,b)=>(a+b)) / lon_list.length;
+
+	// construct map
+	var myMap = L.map('mapid').setView([avg_lat, avg_lon], 13);
+
+	// get tile data using api (please dont misuse my api token)
+	// and add it to the map
+	var accessToken = "pk.eyJ1Ijoid2NzdW4iLCJhIjoiY2ttMzRqMjFlMG16dDJ4anZveW13YzVxYyJ9.dVGn6WMRq5T555GYt7Q8ew"
+	L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+		attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+		maxZoom: 18,
+		id: 'mapbox/streets-v11',
+		tileSize: 512,
+		zoomOffset: -1,
+		accessToken: accessToken
+	}).addTo(myMap);
+
+	// plot the points
+	for (const point of data) {
+		var marker = L.marker([point.lat, point.lon]).addTo(myMap);
+		marker.bindPopup(get_tooltip(point))
+	}
+}
+
+function get_tooltip(obj) {
+	var d = obj.data;
+	var x = obj.lon;
+	var y = obj.lat;
+	return `<b>Accel-X: </b>${d[0]} <br/> \
+			<b>Accel-Y: </b>${d[1]} <br/> \
+			<b>Accel-Z: </b>${d[2]} <br/> \
+			<b>Gyro-X: </b>${d[3]} °<br/> \
+			<b>Gyro-Y: </b>${d[4]} °<br/> \
+			<b>Gyro-Z: </b>${d[5]} °<br/> \
+			<b>Temp-1: </b>${d[6]} °f<br/> \
+			<b>Temp-2: </b>${d[7]} °f<br/> \
+			<b>Temp-3: </b>${d[8]} °f<br/> \
+			<b>Wheelspeed: </b>${d[9]} mph<br/> \
+			<b>Long: </b>${x}<br/> \
+			<b>Lat: </b>${y} °`;
 }
 
 	

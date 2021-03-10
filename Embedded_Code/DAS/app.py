@@ -84,7 +84,7 @@ def view_uploaded_files(filename: str, sensor: str, function: str):
 
 
 def handle_data(filename,sensor,function):
-    headernames = ["Accel_X", "Accel_Y", "Accel_Z", "Gyro_X", "Gyro_Y", "Gyro_Z", "IR_1", "IR_2", "IR_3", "Wheelspeed"]
+    headernames = ["Accel_X", "Accel_Y", "Accel_Z", "Gyro_X", "Gyro_Y", "Gyro_Z", "IR_1", "IR_2", "IR_3", "Wheelspeed", "Lat", "Long"]
 
     #read csv file, append headers
     df = das.getdf(UPLOAD_FOLDER + filename, headernames) #gets dataframe from csv file

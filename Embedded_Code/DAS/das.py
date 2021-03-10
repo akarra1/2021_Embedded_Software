@@ -16,7 +16,7 @@ import daslib as das
 def main():
     #get command line args (returned as a namespace)
     raw_args = das.getargs()
-    headernames = ["Accel_X", "Accel_Y", "Accel_Z", "Gyro_X", "Gyro_Y", "Gyro_Z", "IR_1", "IR_2", "IR_3", "Wheelspeed"]
+    headernames = ["Accel_X", "Accel_Y", "Accel_Z", "Gyro_X", "Gyro_Y", "Gyro_Z", "IR_1", "IR_2", "IR_3", "Wheelspeed", "Lat", "Long"]
     #read csv file, append headers
     df = das.getdf(raw_args.csvfile, headernames) #gets dataframe from csv file
     print(df.head(3)) #added so I can see what the df looks like (first 3 entries)

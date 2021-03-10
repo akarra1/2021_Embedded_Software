@@ -6,6 +6,12 @@
 
 {% block body %}
 
+<meta id="filename-meta-data" filename="{{filename}}"><meta/>
+
+<div id="loading"></div>
+<div id="chartContainer" style="height: 100%; width: 100%; resize: both;"></div> 
+
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script> <!-- this is the library used for plotting --> 
 <script type="text/javascript" src="{{url_for('static', filename='javascript/position_graph.js')}}"></script>
 
 {% endblock %}

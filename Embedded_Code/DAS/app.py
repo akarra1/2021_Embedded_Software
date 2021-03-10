@@ -52,11 +52,11 @@ def get_file_list() -> [(str, datetime.date, str)]:
 
 def get_file_tuple(filename: str) -> (str, datetime.date, str):
 	filepath: pathlib.Path = pathlib.Path(os.path.join(UPLOAD_FOLDER, filename))
-	modified_time = datetime.datetime.fromtimestamp(filepath.stat().st_ctime)	
-	time_str: str = modified_time.strftime("%b %d %Y %H:%M:%S")	
+	modified_time = datetime.datetime.fromtimestamp(filepath.stat().st_ctime)
 	#	st_ctime is Platform dependent: 	see https://docs.python.org/3/library/os.html#os.stat_result
 	#		the time of most recent metadata change on Unix,
 	#		the time of creation on Windows, expressed in seconds.
+	time_str: str = modified_time.strftime("%b %d %Y %H:%M:%S")	
 	return (filename, modified_time, time_str)
 
 

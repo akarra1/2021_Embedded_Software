@@ -94,7 +94,7 @@ def upload_file():
 	sensor = request.form["sensor"]
 	func = request.form["function"]
 
-	return redirect(url_for('view_uploaded_files', filename=filename, sensor=sensor, function=func))
+	return redirect(url_for('view_graph_against_time', filename=filename, sensor=sensor, function=func))
 
 
 

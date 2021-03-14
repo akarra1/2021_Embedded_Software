@@ -67,10 +67,10 @@ void setup() //initializes different sensors
 	{
 		Serial.println("SD initialization failed");
 	}
-	else
+	/*else
 	{
 		sdcard.SdWriteHeader();
-	}
+	}*/
 }
 
 void loop() //Eventually going to want to multithread this so the other threads can make progress while wheel speed delays

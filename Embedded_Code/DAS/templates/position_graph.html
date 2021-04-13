@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>DAS</title>
+{% endblock %}
+
+{% block body %}
+
+<meta id="filename-meta-data" filename="{{filename}}"><meta/>
+
+<div id="loading"></div>
+<div id="mapid" style="height: 500px; width: 100%; resize: both;"></div> 
+
+<!-- stylesheet for plotting --> 
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
+
+<!-- this is the library used for plotting --> 
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+
+<script type="text/javascript" src="{{url_for('static', filename='javascript/position_graph.js')}}"></script>
+
+{% endblock %}

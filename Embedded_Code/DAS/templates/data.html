@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>DAS</title>
+{% endblock %}
+
+{% block body %}
+
+<meta id="filename-meta-data" filename="{{filename}}"><meta/>
+
+<div class="row">
+
+    <div class="column">
+        {% include 'plot.html' %}
+        <text style="text-align:center">Note: Each sample is taken approximately every 100ms <br /> </text>
+    </div>
+
+    <div class="column">
+        <text>Plotting: {{filename}} <br /></text>
+
+        <text>Sensor: </text>
+		<select name="sensor" id="sensor-select" onchange="on_select_change()">
+			<option value="accel" {% if sensor=="accel" %} selected="selected"{% endif %}>Acceleration</option>
+			<option value="gyro" {% if sensor=="gyro" %} selected="selected"{% endif %}>Gyro</option>
+			<option value="temp" {% if sensor=="temp" %} selected="selected"{% endif %}>Temperature</option>
+			<option value="wheelspeed" {% if sensor=="wheelspeed" %} selected="selected"{% endif %}>Wheelspeed</option>
+		</select>
+		<br/>
+
+        <text>Function: </text>
+		<select name="function" id="function-select" onchange="on_select_change()">
+			<option value="raw" {% if function=="raw" %} selected="selected"{% endif %}>Raw</option>
+			<option value="relmin" {% if function=="relmin" %} selected="selected"{% endif %}>Relative Minimum</option>
+			<option value="relmax" {% if function=="relmax" %} selected="selected"{% endif %}>Relative Maximum</option>
+		</select>
+		<br/>
+
+        <text>Averages</text>
+        {% for avg in averages %}
+        <li>
+            <text>{{avg[0]}}: {{ (avg[1])|round(3) }}</text>
+        </li>
+        {% endfor %}
+        <br />
+        <text>Absolute Minimums</text>
+        {% for min in absmins %}
+        <li>
+            <text>{{min[0]}}: {{ (min[1])|round(3) }}</text>
+        </li>
+        {% endfor %}
+        <br />
+        <text>Absolute Maximums</text>
+        {% for max in absmaxes %}
+        <li>
+            <text>{{max[0]}}: {{ (max[1])|round(3) }}</text>
+        </li>
+        {% endfor %}
+    </div>
+
+</div>
+
+
+<script type="text/javascript" src="{{url_for('static', filename='javascript/data.js')}}"></script>
+
+{% endblock %}

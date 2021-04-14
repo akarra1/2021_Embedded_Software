@@ -1,4 +1,4 @@
-#include "can.h"		// header file for this module
+#include "can.h"// header file for this module
 
 // Public interface for the CAN module
 

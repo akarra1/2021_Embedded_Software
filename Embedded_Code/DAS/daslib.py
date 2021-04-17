@@ -3,7 +3,7 @@
 # Last Revision: Sept 4th, 2020
 
 import matplotlib
-matplotlib.use('Agg') #prevents error "main thread is not in main loop"
+
 
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
@@ -84,8 +84,12 @@ def absExtremum(data, extype):
 
 ####### BEGIN VISUALIZATION FUCNTIONS #######
 
-def plotGraph(df, units, *args): #optional parameter expressed in args
+def plotGraph(df, units, cl = False, *args): #optional parameter expressed in args
     
+    if (not cl):
+        # only needs to be called when running the web appication version
+        matplotlib.use('Agg') #prevents error "main thread is not in main loop"
+
     # Define some CSS to control our custom labels
     css = """
     text span
@@ -144,7 +148,8 @@ def plotGraph(df, units, *args): #optional parameter expressed in args
     html_file.write(html_str)
     html_file.close()
 
-    #plt.show() #no longer needed because of web application
+    if (cl):
+        plt.show() #no longer needed because of web application
 
     return fig
     

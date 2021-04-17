@@ -3,6 +3,8 @@
 # Maintained by Michael Felizardo and William Sun
 # Last Revision: 3/7/2021 
 
+# This is the main module used for running the DAS Web Application Version
+# For the command line version, see das.py
 
 import os
 import pathlib
@@ -161,13 +163,13 @@ def handle_data(filename,sensor,function):
                 fig = das.plotGraph(f_data, "mph")        #miles per hour
         else:
             if(sensor == "accel"):
-                fig = das.plotGraph(df, "Gs", f_data)         #g force
+                fig = das.plotGraph(df, "Gs", False, f_data)         #g force
             elif(sensor == 'gyro'):    
-                fig = das.plotGraph(df, "Dps", f_data)        #degrees per second
+                fig = das.plotGraph(df, "Dps", False, f_data)        #degrees per second
             elif(sensor == "temp"):    
-                fig = das.plotGraph(df, "Fahrenheit", f_data) #fahrenheit
+                fig = das.plotGraph(df, "Fahrenheit", False, f_data) #fahrenheit
             elif(sensor == "wheelspeed"):
-                fig = das.plotGraph(df, "mph", f_data)        #miles per hour
+                fig = das.plotGraph(df, "mph", False, f_data)        #miles per hour
 
         
         averages = das.get_avg(df)

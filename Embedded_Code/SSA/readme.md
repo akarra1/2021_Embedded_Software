@@ -24,9 +24,14 @@ Andrew Kettle, Jada Berenguer, Leslie Uribe, and Micheal Barbosa
    3) click open project, and navigate to SSA root directory
    4) Platformio should install the necessary dependencies for you
    - ![platformio interface](readme_src/platformio-interface.png)
-4) Build with tick button in the bottom left 
+4) Recursively clone git submodules
+   1) We are using a library called FlexCAN that is not in Platformio
+   2) Luckily it is open-source, so we are including the git repo for the FlexCAN library in the lib directory using a git feature called submodules
+   3) When cloning a repository, it doesnt automatically clone the submodules of the repo. In order to do this, go to the root directory of the repository and run this command
+      - git submodule update --init
+5) Build with tick button in the bottom left 
    - ![build button](readme_src/build-button.png)
-5) Upload built hex to the Teensy by pressing the upload button in the bottom left. It looks like a right arrow
+6) Upload built hex to the Teensy by pressing the upload button in the bottom left. It looks like a right arrow
    - ![upload button](readme_src/upload-button.png)
 
 ## Helpful Notes:

@@ -98,6 +98,7 @@ void loop() //Eventually going to want to multithread this so the other threads 
 			gpsModule.getLatitude(), gpsModule.getLongitude()))
 		{
 			Serial.print("Couldn't open file for writing ");
+			printAllData();
 		}
 
 		// send data over CAN

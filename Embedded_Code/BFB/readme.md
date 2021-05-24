@@ -14,23 +14,23 @@ The data sheets for the hardware components are as follows:
 
 ## Teensy Hardware Connections
 Multiplexer 1:
-A0 (Address Line 0) --> Pin 5
-A1 (Address Line 1) --> Pin 6
-A2 (Address  Line 2) --> Pin 7 
-A3 (Address Line 3) --> Pin 8
-EN (Enable pin) --> Pin 9
-Output PIN --> Pin 14
+- A0 (Address Line 0) --> Pin 5
+- A1 (Address Line 1) --> Pin 6
+- A2 (Address  Line 2) --> Pin 7 
+- A3 (Address Line 3) --> Pin 8
+- EN (Enable pin) --> Pin 9
+- Output PIN --> Pin 14
 
 Multiplexer 2:
-A0 (Address Line 0) --> Pin 35
-A1 (Address Line 1) --> Pin 36
-A2 (Address  Line 2) --> Pin 37
-A3 (Address Line 3) --> Pin 38
-EN (Enable pin) --> Pin 30
-Output PIN --> Pin 15
+- A0 (Address Line 0) --> Pin 35
+- A1 (Address Line 1) --> Pin 36
+- A2 (Address  Line 2) --> Pin 37
+- A3 (Address Line 3) --> Pin 38
+- EN (Enable pin) --> Pin 30
+- Output PIN --> Pin 15
 
-The 26 analog lines are connected to the multiplexers in order. 
-Populates all 16 lines of mux1 and 10 lines of mux2. 
+The 26 analog lines are connected to the multiplexers in order. \
+Populates all 16 lines of mux1 and 10 lines of mux2. \
 The last 6 lines of mux2 (S11-S16) are the ones that are not populated. 
 
 

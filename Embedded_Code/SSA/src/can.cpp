@@ -59,9 +59,15 @@ void CanInterface::sendMessage(uint32_t can_id, const CanMessageData& msg) {
 		0,						// uint8_t ext - identifier is extended
 		8,						// uint8_t len - length of data
 		0,						// uint16_t timeout - milliseconds, zero will disable waiting
-		*(msg.byte_arr)			// uint8_t buf[8]
+		NULL			// uint8_t buf[8]
 	};
+	
+	//inserts applicable values from msg.byte_arr to can_message buf
+	for(int i = 0; i < 8; i++)
+		can_message.buf[i] = msg.byte_arr[i];
+
 	flexCanInstance.write(can_message);
+	delay(100);
 }
 
 
@@ -88,7 +94,7 @@ void CanInterface::sendAccelY(float a) {
 } 
 
 void CanInterface::sendAccelZ(float a) {
-	sendDouble(GYRO_Z_CAN_ID, a);
+	sendDouble(ACCEL_Z_CAN_ID, a);
 } 
 
 void CanInterface::sendGyroX(float p) {

@@ -59,6 +59,9 @@ void setup() //initializes different sensors
 	//beginning serial, default is 12 mbit/s for teensys
 	Serial.begin(9600);
 
+	//can interface setup
+	canInterface.setupCan();
+
 	//setting up sensors
 	temp.analogSetup();
 	lsm9ds1.IMU_init();
@@ -98,7 +101,6 @@ void loop() //Eventually going to want to multithread this so the other threads 
 			gpsModule.getLatitude(), gpsModule.getLongitude()))
 		{
 			Serial.print("Couldn't open file for writing ");
-			printAllData();
 		}
 
 		// send data over CAN

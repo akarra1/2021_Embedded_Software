@@ -1,19 +1,19 @@
 #include <Arduino.h>
+#include "multiplexer.hpp"
 
 const int FAULT_PIN = 21;
-const int INPUT_PINS[] = {14,15,16,17,18,19,20,21,22,23,31,32,33,34,35,36,37,38,39};
 
 bool shouldTurnLedOn;
+Multiplexer analogMuxes;
 
 void setup() {
+	// pinMode for all the mux inputs and outpus
+	// are taken care of by the Multiplexer constructor
+	analogMuxes = Multiplexer();
+
 	// the FAULT_PIN is the pin where the output signal is high
 	// if any of the temperatures are above the threshold.
 	pinMode(FAULT_PIN, OUTPUT);
-
-	// set analog pins to input
-	for(int pin: INPUT_PINS) {
-		pinMode(pin, INPUT);
-	}
 }
 
 
@@ -39,10 +39,9 @@ void checkThreshold(unsigned int analogVal) {
 // proper operating range, a fault LED is enabled
 void loop() {
 	shouldTurnLedOn = false;
-	for(int pinNum: INPUT_PINS) {
-		unsigned int value = analogRead(pinNum);
+	for(unsigned char i=0; i<26; ++i) {
+		unsigned int value = analogMuxes.readLine(i);
 		checkThreshold(value);
 	}
-	// if there is a fault, output low
-	digitalWrite(FAULT_PIN, shouldTurnLedOn? LOW: HIGH);
+	digitalWrite(FAULT_PIN, shouldTurnLedOn? HIGH: LOW);
 }

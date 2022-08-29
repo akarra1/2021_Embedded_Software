@@ -6,7 +6,6 @@
 
 #include "wheelspeed.h"
 
-
 WheelSpeed::WheelSpeed() {
 	prev_time = 0;
 	last_time = micros();
